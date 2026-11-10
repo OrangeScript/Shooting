@@ -1,0 +1,83 @@
+
+# ==================================================
+# Unity Project .gitignore
+# ==================================================
+
+# 1. Unity 自动生成的缓存
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+
+# 2. Unity 构建输出
+[Bb]uild/
+[Bb]uilds/
+
+# 3. Unity 录制、性能分析和内存捕获
+[Mm]emoryCaptures/
+[Rr]ecordings/
+[Cc]aptures/
+
+# 4. Visual Studio
+.vs/
+*.csproj
+*.unityproj
+*.sln
+*.slnx
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.opendb
+*.VC.db
+
+# 5. VS Code
+.vscode/
+
+# 6. JetBrains Rider
+.idea/
+*.DotSettings.user
+
+# 7. 编译与调试临时文件
+*.pdb
+*.mdb
+*.tmp
+*.bak
+*.orig
+*.log
+
+# 8. 操作系统生成的文件
+.DS_Store
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# 9. Unity 崩溃信息
+sysinfo.txt
+*.stackdump
+*.crash
+
+# 10. Gradle / Android 构建缓存
+.gradle/
+.gradle-cache/
+*.apk
+*.aab
+
+# 11. Unity Asset Store 工具生成文件
+/Assets/AssetStoreTools*
+
+# ==================================================
+# 必须保留在 Git 中：
+# Assets/
+# Packages/
+# ProjectSettings/
+#
+# 特别注意：
+# 不要忽略 *.meta
+# 不要忽略 Packages/manifest.json
+# 不要忽略 Packages/packages-lock.json
+# 不要忽略 *.unity / *.prefab / *.asset
+# ==================================================

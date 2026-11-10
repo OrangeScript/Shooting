@@ -22,6 +22,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("Attack")]
     [SerializeField] private float attackCooldown = 0.5f;
+    PlayerCombat combat;
 
     private CharacterController controller;
     private Vector2 moveInput;
@@ -35,6 +36,7 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
+        combat = GetComponent<PlayerCombat>();
 
         if (animator == null)
             animator = GetComponentInChildren<Animator>();
@@ -51,13 +53,11 @@ public class PlayerController : MonoBehaviour
 
     public void OnAttack(InputValue value)
     {
-        if (!value.isPressed || Time.time < nextAttackTime)
+        if (!value.isPressed)
             return;
 
-        nextAttackTime = Time.time + attackCooldown;
-
-        if (animator != null)
-            animator.SetTrigger("Attack");
+        if (combat != null)
+            combat.TryAttack();
     }
 
     public void OnDash(InputValue value)
@@ -148,9 +148,9 @@ public class PlayerController : MonoBehaviour
         // D → 世界 +X
 
         Vector3 direction = new Vector3(
-            moveInput.x,
+            moveInput.y,
             0f,
-            moveInput.y
+            -moveInput.x
         );
 
         // 防止斜向移动速度超过普通速度

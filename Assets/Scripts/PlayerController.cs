@@ -1,10 +1,12 @@
 
+using System;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(PlayerInput))]
-public class PlayerController : MonoBehaviour
+public class PlayerController : NetworkBehaviour
 {
     [Header("References")]
     [SerializeField] private Transform cameraTransform;
@@ -26,6 +28,7 @@ public class PlayerController : MonoBehaviour
 
     private CharacterController controller;
     private Vector2 moveInput;
+    private PlayerInput playerInput;
     private float verticalVelocity;
 
     private Vector3 dashDirection;
@@ -37,6 +40,8 @@ public class PlayerController : MonoBehaviour
     {
         controller = GetComponent<CharacterController>();
         combat = GetComponent<PlayerCombat>();
+        playerInput = GetComponent<PlayerInput>();
+        playerInput.enabled = false;
 
         if (animator == null)
             animator = GetComponentInChildren<Animator>();
@@ -44,25 +49,43 @@ public class PlayerController : MonoBehaviour
         if (cameraTransform == null && Camera.main != null)
             cameraTransform = Camera.main.transform;
     }
-
-    // Input System 通过 Send Messages 调用
-    public void OnMove(InputValue value)
+    public override void OnNetworkSpawn()
     {
+        // 只有角色拥有者启用输入
+        playerInput.enabled = IsOwner;
+
+        moveInput = Vector2.zero;
+        verticalVelocity = 0f;
+        dashTimeRemaining = 0f;
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        playerInput.enabled = false;
+        moveInput = Vector2.zero;
+        dashTimeRemaining = 0f;
+    }
+public void OnMove(InputValue value)
+    {
+        if (!IsSpawned || !IsOwner) return;
+
         moveInput = value.Get<Vector2>();
     }
 
     public void OnAttack(InputValue value)
     {
-        if (!value.isPressed)
-            return;
+        if (!IsSpawned || !IsOwner) return;
+        if (!value.isPressed) return;
 
-        if (combat != null)
-            combat.TryAttack();
+        combat?.TryAttack();
     }
 
     public void OnDash(InputValue value)
     {
-        if (!value.isPressed || Time.time < nextDashTime)
+        if (!IsSpawned || !IsOwner) return;
+        if (!value.isPressed) return;
+
+        if (Time.time < nextDashTime)
             return;
 
         if (dashTimeRemaining > 0f)
@@ -70,7 +93,6 @@ public class PlayerController : MonoBehaviour
 
         Vector3 direction = GetMoveDirection();
 
-        // 不按移动键时，沿角色当前朝向冲刺
         if (direction.sqrMagnitude < 0.001f)
             direction = transform.forward;
 
@@ -83,6 +105,14 @@ public class PlayerController : MonoBehaviour
     }
 
     private void Update()
+    {
+        if (!IsSpawned || !IsOwner)
+            return;
+
+        MoveCharacter();
+    }
+
+    private void MoveCharacter()
     {
         Vector3 moveDirection = GetMoveDirection();
 
@@ -99,7 +129,7 @@ public class PlayerController : MonoBehaviour
         if (isDashing)
             dashTimeRemaining -= Time.deltaTime;
 
-        // 1. 角色朝移动方向转身
+        // 旋转
         if (direction.sqrMagnitude > 0.001f)
         {
             Quaternion targetRotation =
@@ -112,20 +142,20 @@ public class PlayerController : MonoBehaviour
             );
         }
 
-        // 2. 重力
+        // 重力
         if (controller.isGrounded && verticalVelocity < 0f)
             verticalVelocity = -2f;
 
         verticalVelocity += gravity * Time.deltaTime;
 
-        // 3. 水平移动 + 竖直速度
+        // 移动
         Vector3 velocity =
             direction * speed +
             Vector3.up * verticalVelocity;
 
         controller.Move(velocity * Time.deltaTime);
 
-        // 4. 驱动动画
+        // 动画
         if (animator != null)
         {
             float animationSpeed =

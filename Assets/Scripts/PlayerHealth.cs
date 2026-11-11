@@ -14,6 +14,7 @@ public class PlayerHealth : NetworkBehaviour
         NetworkVariableWritePermission.Server);
 
     public int CurrentHealth =>currentHealth.Value;
+    public int MaxHealth => maxHealth;
     public bool IsDead => CurrentHealth <= 0;
     private int deathLayerIndex = -1;
 

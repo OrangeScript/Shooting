@@ -1,0 +1,8 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="HealthContainer" style="flex-grow: 1; height: 877px; flex-direction: row;">
+        <ui:Label tabindex="-1" text="血量" parse-escape-sequences="true" display-tooltip-when-elided="true" name="HPTitle" style="-unity-font-definition: initial; -unity-font: url(&quot;project://database/Assets/UI/ZH-CN.TTF?fileID=12800000&amp;guid=a8486fd5da0b84346be64972d8c3c492&amp;type=3#ZH-CN&quot;); align-items: center; flex-direction: row-reverse; width: 74px; height: 66px; font-size: 36px; color: rgb(255, 255, 255);" />
+        <ui:VisualElement name="HealthBarBG" style="flex-grow: 1; height: 42px; width: 475px; position: absolute; left: 88px; background-color: rgb(255, 255, 255); top: 8px;">
+            <ui:VisualElement name="HealthFill" style="flex-grow: 1; height: 27px; width: 325px; position: relative; background-color: rgb(255, 113, 113);" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

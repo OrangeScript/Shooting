@@ -6,7 +6,8 @@ using UnityEngine;
 public class PlayerHealth : NetworkBehaviour
 {
     [SerializeField] private int maxHealth = 100;
-    private Animator anim;
+    [Tooltip("可选；未指定时自动查找子物体中的 Animator（包含未激活对象）。")]
+    [SerializeField] private Animator anim;
 
     private readonly NetworkVariable<int> currentHealth = new( 
         100,
@@ -20,8 +21,12 @@ public class PlayerHealth : NetworkBehaviour
 
     private void Awake()
     {
-        anim = GetComponentInChildren<Animator>();
-        deathLayerIndex = anim.GetLayerIndex("DeathLayer");
+        if (anim == null)
+            anim = GetComponentInChildren<Animator>(true);
+
+        // 测试胶囊等没有动画的物体仍然可以使用生命值逻辑。
+        if (anim != null)
+            deathLayerIndex = anim.GetLayerIndex("DeathLayer");
     }
 
     public override void OnNetworkSpawn()
@@ -62,7 +67,8 @@ public class PlayerHealth : NetworkBehaviour
         {
             Debug.Log($"{name} 受到攻击！");
 
-            anim.SetTrigger("Hit");
+            if (anim != null)
+                anim.SetTrigger("Hit");
         }
 
         if (oldHP > 0 && newHP <= 0)

@@ -68,6 +68,16 @@ public class PlayerController : NetworkBehaviour
 
         jumpRequested = true;
     }
+    public void OnKick(InputValue inputValue)
+    {
+        if (!IsSpawned || !IsOwner)
+            return;
+
+        if (!inputValue.isPressed)
+            return;
+
+        networkAnimator.SetTrigger("Kick");
+    }
 
     public override void OnNetworkSpawn()
     {

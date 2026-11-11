@@ -9,9 +9,11 @@ public class PlayerAppearance : MonoBehaviour
     [SerializeField] private Transform weaponSocket;
     [SerializeField] private Transform headSocket;
     [SerializeField] private Transform backSocket;
+    [Tooltip("角色已有的武器子物体，或要挂载到 Weapon Socket 的武器预制体。")]
     [SerializeField] private GameObject defaultWeaponVisual;
 
     private CharacterController controller;
+    private GameObject defaultWeaponInstance;
     private Vector3 baseVisualScale;
     private float baseHeight;
     private float baseRadius;
@@ -36,6 +38,36 @@ public class PlayerAppearance : MonoBehaviour
             baseCenter = controller.center;
             baseStepOffset = controller.stepOffset;
         }
+
+        InitializeDefaultWeapon();
+    }
+
+    private void InitializeDefaultWeapon()
+    {
+        if (defaultWeaponVisual == null)
+            return;
+
+        // 已挂在角色身上的模型可以直接切换显示；资源需要先实例化。
+        if (defaultWeaponVisual.transform.IsChildOf(transform))
+        {
+            defaultWeaponInstance = defaultWeaponVisual;
+        }
+        else
+        {
+            if (weaponSocket == null)
+            {
+                Debug.LogError("默认武器缺少 Weapon Socket，无法挂载。", this);
+                return;
+            }
+
+            defaultWeaponInstance = Instantiate(
+                defaultWeaponVisual, weaponSocket, false
+            );
+            defaultWeaponInstance.transform.localPosition = Vector3.zero;
+            defaultWeaponInstance.transform.localRotation = Quaternion.identity;
+        }
+
+        defaultWeaponInstance.SetActive(true);
     }
 
     public void Apply(
@@ -52,8 +84,8 @@ public class PlayerAppearance : MonoBehaviour
 
         spawned.Clear();
 
-        if (defaultWeaponVisual != null)
-            defaultWeaponVisual.SetActive(true);
+        if (defaultWeaponInstance != null)
+            defaultWeaponInstance.SetActive(true);
 
         // 同槽位后获得的道具优先显示
         Dictionary<EquipmentSlot, ItemDefinition>
@@ -85,9 +117,9 @@ public class PlayerAppearance : MonoBehaviour
             spawned[pair.Key] = model;
 
             if (pair.Key == EquipmentSlot.Weapon &&
-                defaultWeaponVisual != null)
+                defaultWeaponInstance != null)
             {
-                defaultWeaponVisual.SetActive(false);
+                defaultWeaponInstance.SetActive(false);
             }
         }
 

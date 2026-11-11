@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3045461911026867957
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1819047299401376336}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1819047299401376336
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3045461911026867957}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.29883626, y: 0.027144259, z: -0.6408563, w: 0.7065856}
+  m_LocalPosition: {x: 0, y: 0.12000011, z: 0.040000085}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1303684337225610500}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6057912127337214985
 GameObject:
   m_ObjectHideFlags: 0
@@ -150,7 +181,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1869389681
+  GlobalObjectIdHash: 3693577513
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -336,7 +367,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   visualRoot: {fileID: 1777055231447170}
-  weaponSocket: {fileID: 2470514702646563100}
+  weaponSocket: {fileID: 1819047299401376336}
   headSocket: {fileID: 0}
   backSocket: {fileID: 0}
   defaultWeaponVisual: {fileID: 919132149155446097, guid: d0c82f4bafde3ca479ffed81abd0ac27,
@@ -785,6 +816,10 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -8995212700073126884, guid: fe180a13f03db1a49aadbd043ed44b6f,
         type: 3}
       insertIndex: -1
+      addedObject: {fileID: 1819047299401376336}
+    - targetCorrespondingSourceObject: {fileID: -8995212700073126884, guid: fe180a13f03db1a49aadbd043ed44b6f,
+        type: 3}
+      insertIndex: -1
       addedObject: {fileID: 1455027476431821883}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: fe180a13f03db1a49aadbd043ed44b6f,
@@ -847,12 +882,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9653818d862499b4e950cd47b9797168, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!4 &2470514702646563100 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: -5515783359193845756, guid: fe180a13f03db1a49aadbd043ed44b6f,
-    type: 3}
-  m_PrefabInstance: {fileID: 1242158187866333464}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1421996990754700240
 PrefabInstance:
   m_ObjectHideFlags: 0

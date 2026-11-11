@@ -22,8 +22,11 @@ public class PlayerCombat : NetworkBehaviour
     private float serverAttackExpireTime;
     private bool serverAttackPending;
 
+    private PlayerInventory inventory;
+
     private void Awake()
     {
+        inventory = GetComponent<PlayerInventory>();
         health = GetComponent<PlayerHealth>();
         networkAnimator = GetComponentInChildren<NetworkAnimator>();
     }
@@ -115,12 +118,14 @@ public class PlayerCombat : NetworkBehaviour
             if (target == health) continue;
             if (target.IsDead) continue;
             if (!damaged.Add(target)) continue;
+            int finalDamage = damage +
+             (inventory != null ? inventory.BonusDamage : 0);
 
-            target.TakeDamage(damage);
+            target.TakeDamage(finalDamage);
 
             Debug.Log(
                 $"Player {OwnerClientId} 命中 Player " +
-                $"{target.OwnerClientId}，伤害 {damage}"
+                $"{target.OwnerClientId}，伤害 {finalDamage}"
             );
         }
     }

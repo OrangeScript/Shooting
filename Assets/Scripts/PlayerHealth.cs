@@ -1,34 +1,94 @@
 
+using System;
+using Unity.Netcode;
 using UnityEngine;
 
-public class PlayerHealth : MonoBehaviour
+public class PlayerHealth : NetworkBehaviour
 {
     [SerializeField] private int maxHealth = 100;
+    private Animator anim;
 
-    private int currentHealth;
+    private readonly NetworkVariable<int> currentHealth = new( 
+        100,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Server);
 
-    public bool IsDead => currentHealth <= 0;
+    public int CurrentHealth =>currentHealth.Value;
+    public bool IsDead => CurrentHealth <= 0;
+    private int deathLayerIndex = -1;
 
     private void Awake()
     {
-        currentHealth = maxHealth;
+        anim = GetComponentInChildren<Animator>();
+        deathLayerIndex = anim.GetLayerIndex("DeathLayer");
     }
+
+    public override void OnNetworkSpawn()
+    {
+        currentHealth.OnValueChanged += OnHealthChanged;
+
+        if (IsServer)
+            currentHealth.Value = maxHealth;
+
+        Debug.Log($"{name}: 初始 HP = {CurrentHealth}");
+        ApplyDeathState();
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        currentHealth.OnValueChanged -= OnHealthChanged;
+    }
+
 
     public void TakeDamage(int damage)
     {
-        if (IsDead) return;
+        if (!IsSpawned || !IsServer) return;
+        if (IsDead || damage <= 0) return;
 
-        currentHealth = Mathf.Max(
-            0, currentHealth - damage
+        currentHealth.Value = Mathf.Max(
+            0,
+            CurrentHealth - damage
         );
+    }
 
+    private void OnHealthChanged(int oldHP, int newHP)
+    {
         Debug.Log(
-            $"{name} HP: {currentHealth}/{maxHealth}"
+            $"Player {OwnerClientId}: HP {oldHP} -> {newHP}"
         );
 
-        if (IsDead)
+        if (newHP < oldHP && newHP > 0)
         {
-            Debug.Log($"{name} died!");
+            Debug.Log($"{name} 受到攻击！");
+
+            anim.SetTrigger("Hit");
+        }
+
+        if (oldHP > 0 && newHP <= 0)
+        {
+            Debug.Log($"{name} 死亡！");
+            ApplyDeathState();
         }
     }
+
+        private void ApplyDeathState()
+        {
+            if (anim == null)
+                return;
+
+            bool dead = IsDead;
+
+            // 持久状态，不使用一次性 Trigger
+            anim.SetBool("IsDead", dead);
+
+            if (deathLayerIndex >= 0)
+            {
+                // 死亡时全身覆盖，活着时不影响正常动作
+                anim.SetLayerWeight(
+                    deathLayerIndex,
+                    dead ? 1f : 0f
+                );
+            }
+        }
+
 }

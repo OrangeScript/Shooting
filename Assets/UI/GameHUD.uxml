@@ -1,8 +1,28 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:VisualElement name="HealthContainer" style="flex-grow: 1; height: 877px; flex-direction: row;">
-        <ui:Label tabindex="-1" text="血量" parse-escape-sequences="true" display-tooltip-when-elided="true" name="HPTitle" style="-unity-font-definition: initial; -unity-font: url(&quot;project://database/Assets/UI/ZH-CN.TTF?fileID=12800000&amp;guid=a8486fd5da0b84346be64972d8c3c492&amp;type=3#ZH-CN&quot;); align-items: center; flex-direction: row-reverse; width: 74px; height: 66px; font-size: 36px; color: rgb(255, 255, 255);" />
-        <ui:VisualElement name="HealthBarBG" style="flex-grow: 1; height: 42px; width: 475px; position: absolute; left: 88px; background-color: rgb(255, 255, 255); top: 8px;">
-            <ui:VisualElement name="HealthFill" style="flex-grow: 1; height: 27px; width: 325px; position: relative; background-color: rgb(255, 113, 113);" />
+    <ui:VisualElement name="HUDRoot" picking-mode="Ignore" style="position: absolute; left: 0; right: 0; top: 0; bottom: 0; -unity-font-definition: initial; -unity-font: url(&quot;project://database/Assets/UI/ZH-CN.TTF?fileID=12800000&amp;guid=a8486fd5da0b84346be64972d8c3c492&amp;type=3#ZH-CN&quot;);">
+        <ui:VisualElement name="HealthContainer" picking-mode="Ignore" style="position: absolute; left: 0; top: 0; width: 575px; height: 66px; flex-direction: row;">
+            <ui:Label tabindex="-1" text="血量" parse-escape-sequences="true" display-tooltip-when-elided="true" name="HPTitle" picking-mode="Ignore" style="align-items: center; flex-direction: row-reverse; width: 74px; height: 66px; font-size: 36px; color: rgb(255, 255, 255);" />
+            <ui:VisualElement name="HealthBarBG" picking-mode="Ignore" style="flex-grow: 1; height: 42px; width: 475px; position: absolute; left: 88px; background-color: rgb(255, 255, 255); top: 8px;">
+                <ui:VisualElement name="HealthFill" picking-mode="Ignore" style="flex-grow: 1; height: 27px; width: 325px; position: relative; background-color: rgb(255, 113, 113);" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="TouchControls" picking-mode="Ignore" style="display: none; position: absolute; left: 0; right: 0; top: 0; bottom: 0; flex-direction: row; justify-content: space-between; align-items: flex-end;">
+            <ui:VisualElement name="JoystickArea" picking-mode="Position" focusable="false" style="position: relative; width: 220px; height: 220px; flex-shrink: 0; margin-left: 36px; margin-bottom: 36px; border-radius: 110px; border-width: 3px; border-color: rgba(255, 255, 255, 0.4); background-color: rgba(16, 24, 38, 0.3);">
+                <ui:VisualElement name="JoystickKnob" picking-mode="Ignore" style="position: absolute; left: 50%; top: 50%; margin-left: -42px; margin-top: -42px; width: 84px; height: 84px; border-radius: 42px; border-width: 2px; border-color: rgba(255, 255, 255, 0.7); background-color: rgba(225, 236, 255, 0.38);">
+                    <ui:Label text="移动" picking-mode="Ignore" style="flex-grow: 1; margin: 0; padding: 0; font-size: 22px; color: rgba(255, 255, 255, 0.9); -unity-text-align: middle-center;" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="TouchActionArea" picking-mode="Ignore" style="position: relative; width: 350px; height: 270px; flex-shrink: 0; margin-right: 36px; margin-bottom: 28px;">
+                <ui:VisualElement name="TouchAttackButton" picking-mode="Position" focusable="false" style="position: absolute; left: 20px; bottom: 0; width: 136px; height: 136px; border-radius: 68px; border-width: 3px; border-color: rgba(255, 224, 174, 0.8); background-color: rgba(140, 91, 38, 0.4); align-items: center; justify-content: center;">
+                    <ui:Label text="攻击" picking-mode="Ignore" style="margin: 0; padding: 0; font-size: 34px; color: rgb(255, 245, 225); -unity-text-align: middle-center;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="TouchKickButton" picking-mode="Position" focusable="false" style="position: absolute; right: 0; bottom: 0; width: 112px; height: 112px; border-radius: 56px; border-width: 3px; border-color: rgba(255, 255, 255, 0.6); background-color: rgba(34, 48, 68, 0.4); align-items: center; justify-content: center;">
+                    <ui:Label text="踢人" picking-mode="Ignore" style="margin: 0; padding: 0; font-size: 30px; color: rgb(255, 255, 255); -unity-text-align: middle-center;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="TouchJumpButton" picking-mode="Position" focusable="false" style="position: absolute; right: 20px; top: 0; width: 112px; height: 112px; border-radius: 56px; border-width: 3px; border-color: rgba(255, 255, 255, 0.6); background-color: rgba(34, 48, 68, 0.4); align-items: center; justify-content: center;">
+                    <ui:Label text="跳跃" picking-mode="Ignore" style="margin: 0; padding: 0; font-size: 30px; color: rgb(255, 255, 255); -unity-text-align: middle-center;" />
+                </ui:VisualElement>
+            </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

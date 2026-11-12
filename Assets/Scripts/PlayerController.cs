@@ -34,6 +34,7 @@ public class PlayerController : NetworkBehaviour
 
     private CharacterController controller;
     private Vector2 moveInput;
+    private Vector2 touchMoveInput;
     private PlayerInput playerInput;
     private float verticalVelocity;
 
@@ -72,23 +73,40 @@ public class PlayerController : NetworkBehaviour
     }
     public void OnJump(InputValue value)
     {
-        if (!IsSpawned || !IsOwner || IsKnockedBack)
-            return;
-
-        if (!value.isPressed)
-            return;
-
-        jumpRequested = true;
+        if (value.isPressed)
+            RequestJump();
     }
     public void OnKick(InputValue inputValue)
     {
-        if (!IsSpawned || !IsOwner || IsKnockedBack)
-            return;
+        if (inputValue.isPressed && !GameHUDController.IsPointerOverTouchControls())
+            RequestKick();
+    }
 
-        if (!inputValue.isPressed)
-            return;
+    public void SetTouchMoveInput(Vector2 input)
+    {
+        if (IsSpawned && IsOwner)
+            touchMoveInput = Vector2.ClampMagnitude(input, 1f);
+    }
 
-        networkAnimator.SetTrigger("Kick");
+    private bool CanUseAction => IsSpawned && IsOwner && !IsKnockedBack &&
+        (health == null || !health.IsDead);
+
+    public void RequestJump()
+    {
+        if (CanUseAction)
+            jumpRequested = true;
+    }
+
+    public void RequestKick()
+    {
+        if (CanUseAction && networkAnimator != null)
+            networkAnimator.SetTrigger("Kick");
+    }
+
+    public void RequestAttack()
+    {
+        if (CanUseAction)
+            combat?.TryAttack();
     }
 
     public override void OnNetworkSpawn()
@@ -97,6 +115,7 @@ public class PlayerController : NetworkBehaviour
         playerInput.enabled = IsOwner;
 
         moveInput = Vector2.zero;
+        touchMoveInput = Vector2.zero;
         verticalVelocity = 0f;
         dashTimeRemaining = 0f;
         ResetCombatMovement();
@@ -106,6 +125,7 @@ public class PlayerController : NetworkBehaviour
     {
         playerInput.enabled = false;
         moveInput = Vector2.zero;
+        touchMoveInput = Vector2.zero;
         dashTimeRemaining = 0f;
         ResetCombatMovement();
     }
@@ -127,10 +147,8 @@ public class PlayerController : NetworkBehaviour
 
     public void OnAttack(InputValue value)
     {
-        if (!IsSpawned || !IsOwner) return;
-        if (!value.isPressed) return;
-
-        combat?.TryAttack();
+        if (value.isPressed && !GameHUDController.IsPointerOverTouchControls())
+            RequestAttack();
     }
 
     public void OnDash(InputValue value)
@@ -360,6 +378,22 @@ private void MoveCharacter()
 
     private Vector3 GetMoveDirection()
     {
+        if (touchMoveInput.sqrMagnitude > 0.0001f)
+        {
+            // 摇杆方向跟随画面，切换场景后重新取得当前相机。
+            if (cameraTransform == null && Camera.main != null)
+                cameraTransform = Camera.main.transform;
+
+            Vector3 forward = cameraTransform != null
+                ? Vector3.ProjectOnPlane(cameraTransform.forward, Vector3.up).normalized
+                : Vector3.forward;
+            if (forward.sqrMagnitude < 0.001f)
+                forward = Vector3.forward;
+            Vector3 right = Vector3.Cross(Vector3.up, forward);
+            return Vector3.ClampMagnitude(
+                right * touchMoveInput.x + forward * touchMoveInput.y, 1f);
+        }
+
         // W → 世界 +Z
         // S → 世界 -Z
         // A → 世界 -X

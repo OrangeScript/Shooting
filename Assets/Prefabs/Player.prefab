@@ -114,6 +114,7 @@ GameObject:
   - component: {fileID: 3643736065973588543}
   - component: {fileID: 483639099494630309}
   - component: {fileID: 8925812443437617300}
+  - component: {fileID: 8309253010855533429}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -243,6 +244,14 @@ MonoBehaviour:
   attackRadius: 0.34
   attackCooldown: 0.5
   attackPoint: {fileID: 8246342144669579716}
+  sAttackCooldown: 4
+  sAttackDamageMultiplier: 1
+  sAttackFallbackDuration: 4
+  sAttackLungeDistance: 0.45
+  sAttackLungeDuration: 0.15
+  sAttackKnockbackDistance: 0.4
+  sAttackFinisherKnockbackDistance: 1
+  sAttackKnockbackDuration: 0.18
   networkAnimator: {fileID: 0}
 --- !u!143 &3369860072359878340
 CharacterController:
@@ -372,6 +381,19 @@ MonoBehaviour:
   backSocket: {fileID: 0}
   defaultWeaponVisual: {fileID: 919132149155446097, guid: d0c82f4bafde3ca479ffed81abd0ac27,
     type: 3}
+--- !u!114 &8309253010855533429
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8101557923096247403}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1c9350e5b31431418dcd1c47b7c7a8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  followTarget: {fileID: 1777055231447170}
 --- !u!1001 &1242158187866333464
 PrefabInstance:
   m_ObjectHideFlags: 0

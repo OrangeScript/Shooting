@@ -43,10 +43,22 @@ public class PlayerController : NetworkBehaviour
     private float nextAttackTime;
 
     private PlayerInventory inventory;
+    private PlayerHealth health;
+    private Vector3 forcedMoveDirection;
+    private float forcedMoveDistance;
+    private float forcedMoveDuration;
+    private float forcedMoveElapsed;
+    private bool forcedMoveIsKnockback;
+    private float serverKnockbackUntil;
+
+    private bool HasForcedMovement => forcedMoveDistance > 0f && forcedMoveElapsed < forcedMoveDuration;
+    public bool IsKnockedBack => (IsServer && Time.time < serverKnockbackUntil) ||
+        (IsOwner && forcedMoveIsKnockback && HasForcedMovement);
 
     private void Awake()
     {
         inventory = GetComponent<PlayerInventory>();
+        health = GetComponent<PlayerHealth>();
         controller = GetComponent<CharacterController>();
         combat = GetComponent<PlayerCombat>();
         playerInput = GetComponent<PlayerInput>();
@@ -60,7 +72,7 @@ public class PlayerController : NetworkBehaviour
     }
     public void OnJump(InputValue value)
     {
-        if (!IsSpawned || !IsOwner)
+        if (!IsSpawned || !IsOwner || IsKnockedBack)
             return;
 
         if (!value.isPressed)
@@ -70,7 +82,7 @@ public class PlayerController : NetworkBehaviour
     }
     public void OnKick(InputValue inputValue)
     {
-        if (!IsSpawned || !IsOwner)
+        if (!IsSpawned || !IsOwner || IsKnockedBack)
             return;
 
         if (!inputValue.isPressed)
@@ -87,6 +99,7 @@ public class PlayerController : NetworkBehaviour
         moveInput = Vector2.zero;
         verticalVelocity = 0f;
         dashTimeRemaining = 0f;
+        ResetCombatMovement();
     }
 
     public override void OnNetworkDespawn()
@@ -94,6 +107,7 @@ public class PlayerController : NetworkBehaviour
         playerInput.enabled = false;
         moveInput = Vector2.zero;
         dashTimeRemaining = 0f;
+        ResetCombatMovement();
     }
     public void OnMove(InputValue value)
     {
@@ -123,6 +137,7 @@ public class PlayerController : NetworkBehaviour
     {
         if (!IsSpawned || !IsOwner) return;
         if (!value.isPressed) return;
+        if (HasForcedMovement) return;
 
         if (Time.time < nextDashTime)
             return;
@@ -151,18 +166,99 @@ public class PlayerController : NetworkBehaviour
         MoveCharacter();
     }
 
+    private void ResetCombatMovement()
+    {
+        forcedMoveDistance = 0f;
+        forcedMoveDuration = 0f;
+        forcedMoveElapsed = 0f;
+        forcedMoveDirection = Vector3.zero;
+        forcedMoveIsKnockback = false;
+        serverKnockbackUntil = 0f;
+        jumpRequested = false;
+    }
+
+    internal void BeginAttackLunge(Vector3 direction, float distance, float duration)
+    {
+        if (!IsSpawned || !IsOwner || IsKnockedBack || (health != null && health.IsDead))
+            return;
+
+        BeginCombatMovement(direction, distance, duration, false);
+    }
+
+    internal void CancelAttackLunge()
+    {
+        if (!forcedMoveIsKnockback)
+            forcedMoveDistance = 0f;
+    }
+
+    // 服务器决定击退，目标 owner 执行 Move，位置再由已有 NetworkTransform 同步。
+    public void ServerApplyKnockback(Vector3 direction, float distance, float duration)
+    {
+        if (!IsSpawned || !IsServer || distance <= 0f || (health != null && health.IsDead))
+            return;
+
+        direction = Vector3.ProjectOnPlane(direction, Vector3.up);
+        if (direction.sqrMagnitude < 0.001f)
+            return;
+
+        duration = Mathf.Max(0.01f, duration);
+        serverKnockbackUntil = Time.time + duration;
+        var ownerRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams { TargetClientIds = new[] { OwnerClientId } }
+        };
+        ApplyKnockbackClientRpc(direction.normalized, distance, duration, ownerRpcParams);
+    }
+
+    [ClientRpc]
+    private void ApplyKnockbackClientRpc(Vector3 direction, float distance, float duration,
+        ClientRpcParams clientRpcParams = default)
+    {
+        if (!IsSpawned || !IsOwner || (health != null && health.IsDead))
+            return;
+
+        BeginCombatMovement(direction, distance, duration, true);
+        jumpRequested = false;
+    }
+
+    private void BeginCombatMovement(Vector3 direction, float distance, float duration, bool knockback)
+    {
+        direction = Vector3.ProjectOnPlane(direction, Vector3.up);
+        if (direction.sqrMagnitude < 0.001f || distance <= 0f)
+            return;
+
+        forcedMoveDirection = direction.normalized;
+        forcedMoveDistance = distance;
+        forcedMoveDuration = Mathf.Max(0.01f, duration);
+        forcedMoveElapsed = 0f;
+        forcedMoveIsKnockback = knockback;
+        dashTimeRemaining = 0f;
+    }
+
     
 private void MoveCharacter()
 {
     float dt = Time.deltaTime;
 
-    Vector3 moveDirection = GetMoveDirection();
+    bool dead = health != null && health.IsDead;
+    if (dead)
+    {
+        ResetCombatMovement();
+        dashTimeRemaining = 0f;
+    }
+    combat?.UpdateAttackMovement(dt);
+    bool forcedMovement = HasForcedMovement;
+    bool knockedBack = forcedMovement && forcedMoveIsKnockback;
+
+    Vector3 moveDirection = dead ? Vector3.zero : GetMoveDirection();
 
     bool isDashing = dashTimeRemaining > 0f;
 
     Vector3 direction = isDashing
         ? dashDirection
         : moveDirection;
+    if (forcedMovement)
+        direction = forcedMoveDirection;
 
     float speed = isDashing
         ? dashSpeed
@@ -176,7 +272,7 @@ private void MoveCharacter()
         dashTimeRemaining -= dt;
 
     // 1. 角色转向
-    if (direction.sqrMagnitude > 0.001f)
+    if (!knockedBack && direction.sqrMagnitude > 0.001f)
     {
         Quaternion targetRotation =
             Quaternion.LookRotation(direction);
@@ -197,7 +293,7 @@ private void MoveCharacter()
     }
 
     // 3. 跳跃
-    if (jumpRequested && wasGrounded)
+    if (jumpRequested && wasGrounded && !knockedBack && !dead)
     {
         // 根据目标高度计算起跳初速度
         verticalVelocity = Mathf.Sqrt(
@@ -217,13 +313,21 @@ private void MoveCharacter()
     // 4. 重力始终作用
     verticalVelocity += gravity * dt;
 
-    Vector3 velocity =
-        direction * speed +
-        Vector3.up * verticalVelocity;
+    Vector3 horizontalDisplacement = direction * speed * dt;
+    if (forcedMovement)
+    {
+        // 累计 ease-out 进度，末帧只移动余量，不受道具移速倍率影响。
+        float previousProgress = forcedMoveElapsed / forcedMoveDuration;
+        forcedMoveElapsed = Mathf.Min(forcedMoveDuration, forcedMoveElapsed + dt);
+        float progress = forcedMoveElapsed / forcedMoveDuration;
+        float distance = forcedMoveDistance *
+            (progress * (2f - progress) - previousProgress * (2f - previousProgress));
+        horizontalDisplacement = forcedMoveDirection * distance;
+    }
 
     // 5. 只有一次 CharacterController.Move
     CollisionFlags flags =
-        controller.Move(velocity * dt);
+        controller.Move(horizontalDisplacement + Vector3.up * verticalVelocity * dt);
 
     // 6. Move 之后获得最新的地面接触状态
     bool groundedNow =
@@ -238,7 +342,7 @@ private void MoveCharacter()
     if (animator != null)
     {
         float animationSpeed =
-            direction.sqrMagnitude > 0.001f
+            !forcedMovement && direction.sqrMagnitude > 0.001f
                 ? 1f
                 : 0f;
 

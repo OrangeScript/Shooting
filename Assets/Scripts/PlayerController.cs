@@ -109,7 +109,6 @@ public class PlayerController : NetworkBehaviour
         if (!inputValue.isPressed) return;
 
         combat?.TrySAttack();
-        Debug.Log("SAtaack");
     }
 
     public void OnAttack(InputValue value)

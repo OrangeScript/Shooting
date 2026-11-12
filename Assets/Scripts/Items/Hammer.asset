@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b04e18f8f0ca0634ea44520e309b29eb, type: 3}
-  m_Name: Axe
+  m_Name: Hammer
   m_EditorClassIdentifier: 
-  id: 0
-  itemName: Axe
+  id: 101
+  itemName: Hammer
   maxStacks: 1
-  bonusDamage: 10
-  speedMultiplier: 2
-  sizeMultiplier: 2
+  bonusDamage: 0
+  speedMultiplier: 1
+  sizeMultiplier: 1
   slot: 1
-  equipPrefab: {fileID: 7083634958932610579, guid: ce38054bd6bc64749bf3742b2159243e,
+  equipPrefab: {fileID: 7768635420405075065, guid: 5b6499802bbb22b4aa1cb083412997c2,
     type: 3}

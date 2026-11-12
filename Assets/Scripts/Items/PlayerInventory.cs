@@ -6,7 +6,7 @@ using UnityEngine;
 public class PlayerInventory : NetworkBehaviour
 {
     [Header("Item Database")]
-    [SerializeField] private ItemDefinition[] catalog;
+    [SerializeField] private ItemDatabase database;
 
     private NetworkList<int> ownedItems;
     private PlayerAppearance appearance;
@@ -37,13 +37,7 @@ public class PlayerInventory : NetworkBehaviour
 
     private ItemDefinition FindItem(int id)
     {
-        foreach (var item in catalog)
-        {
-            if (item != null && item.id == id)
-                return item;
-        }
-
-        return null;
+        return database.GetItem(id);
     }
 
     // 只能由服务器调用

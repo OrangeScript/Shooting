@@ -9,6 +9,6 @@ public class NetworkPlayerSetup : NetworkBehaviour
 
         // 测试阶段按客户端 ID 分散出生位置
         float x = (OwnerClientId % 8) * 3f;
-        transform.position = new Vector3(x, 1f, 0f);
+        transform.position = new Vector3(x, 4f, 0f);
     }
 }

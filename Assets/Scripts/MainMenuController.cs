@@ -124,7 +124,7 @@ public class MainMenuController : MonoBehaviour
 
         // 由 Host 统一切换所有玩家的场景
         var result = manager.SceneManager.LoadScene(
-            "Scene_01",
+            "Scene_02",
             LoadSceneMode.Single
         );
 

@@ -64,7 +64,7 @@ public class PlayerAppearance : MonoBehaviour
                 defaultWeaponVisual, weaponSocket, false
             );
             defaultWeaponInstance.transform.localPosition = Vector3.zero;
-            defaultWeaponInstance.transform.localRotation = Quaternion.identity;
+            defaultWeaponInstance.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
         }
 
         defaultWeaponInstance.SetActive(true);
@@ -112,7 +112,7 @@ public class PlayerAppearance : MonoBehaviour
             );
 
             model.transform.localPosition = Vector3.zero;
-            model.transform.localRotation = Quaternion.identity;
+            model.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
 
             spawned[pair.Key] = model;
 

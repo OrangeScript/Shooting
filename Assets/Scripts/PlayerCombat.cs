@@ -31,6 +31,27 @@ public class PlayerCombat : NetworkBehaviour
         networkAnimator = GetComponentInChildren<NetworkAnimator>();
     }
 
+    public void TrySAttack()
+    {
+        if (!IsSpawned || !IsOwner) return;
+        if (health.IsDead) return;
+        if (Time.time < nextLocalAttackTime) return;
+
+        if (networkAnimator == null)
+        {
+            Debug.LogError("缺少 NetworkAnimator");
+            return;
+        }
+
+        nextLocalAttackTime = Time.time + attackCooldown;
+
+        // 服务器登记本次攻击，用于命中帧验证
+        RequestAttackServerRpc();
+
+        // 本地立即播放，并同步给其他网络实例
+        networkAnimator.SetTrigger("SAttack");
+    }
+
     public void TryAttack()
     {
         if (!IsSpawned || !IsOwner) return;

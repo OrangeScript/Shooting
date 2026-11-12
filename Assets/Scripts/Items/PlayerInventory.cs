@@ -41,13 +41,13 @@ public class PlayerInventory : NetworkBehaviour
     }
 
     // 只能由服务器调用
-    public bool ServerTryAdd(ItemDefinition item)
+    public bool ServerTryAdd(int itemId)
     {
-        if (!IsServer || !IsSpawned || item == null)
+        if (!IsServer || !IsSpawned )
             return false;
 
 
-        ItemDefinition definition = FindItem(item.id);
+        ItemDefinition definition = FindItem(itemId);
         if (definition == null)
             return false;
 
@@ -55,7 +55,7 @@ public class PlayerInventory : NetworkBehaviour
 
         foreach (int id in ownedItems)
         {
-            if (id == item.id)
+            if (id == itemId)
                 count++;
         }
 

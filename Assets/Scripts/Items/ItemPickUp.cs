@@ -9,14 +9,74 @@ using UnityEngine;
 
 public class ItemPickUp : NetworkBehaviour
 {
-    [SerializeField] private ItemDefinition definition;
+    [SerializeField] private ItemDatabase database;
+    [SerializeField] private Transform visualRoot;
     [SerializeField] private float maxPickDistance = 2.5f;
+
+    private readonly NetworkVariable<int> itemId = new(
+        -1,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Server
+    );
+
+    private GameObject currentVisual;
+    private bool collected;
+
+    public override void OnNetworkSpawn()
+    {
+        itemId.OnValueChanged += OnItemChanged;
+        RefreshVisual();
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        itemId.OnValueChanged -= OnItemChanged;
+    }
+
+    public void ServerInitialize(int id)
+    {
+        if (!IsServer || !IsSpawned)
+            return;
+
+        itemId.Value = id;
+    }
+
+    private void OnItemChanged(int oldId, int newId)
+    {
+        RefreshVisual();
+    }
+
+    private void RefreshVisual()
+    {
+        if (currentVisual != null)
+        {
+            Destroy(currentVisual);
+            currentVisual = null;
+        }
+
+        if (database == null || visualRoot == null)
+            return;
+
+        ItemDefinition item = database.GetItem(itemId.Value);
+
+        if (item == null || item.equipPrefab == null)
+            return;
+
+        currentVisual = Instantiate(
+            item.equipPrefab,
+            visualRoot,
+            false
+        );
+
+        currentVisual.transform.localPosition = Vector3.zero;
+    }
+
+    
 
     private void Reset()
     {
         var trigger = GetComponent<SphereCollider>();
         trigger.isTrigger = true;
-        trigger.radius = 1.2f;
 
         var body = GetComponent<Rigidbody>();
         body.isKinematic = true;
@@ -43,30 +103,31 @@ public class ItemPickUp : NetworkBehaviour
     private void RequestPickupServerRpc(
         ServerRpcParams rpcParams = default)
     {
-        if (!IsServer || !IsSpawned || definition == null)
+        if (!IsServer || !IsSpawned || collected)
             return;
 
-        // 不信任客户端传来的玩家身份
+        if (database == null)
+            return;
+
+        ItemDefinition item = database.GetItem(itemId.Value);
+        if (item == null) return;
+
         ulong senderId = rpcParams.Receive.SenderClientId;
 
         if (!NetworkManager.ConnectedClients.TryGetValue(
             senderId, out var client))
             return;
 
-        var player = client.PlayerObject;
+        NetworkObject player = client.PlayerObject;
         if (player == null) return;
 
-        // 服务器验证距离
-        float distance = Vector3.Distance(
+        if (Vector3.Distance(
             player.transform.position,
             transform.position
-        );
-
-        if (distance > maxPickDistance)
+        ) > maxPickDistance)
             return;
 
-        PlayerHealth health =
-            player.GetComponent<PlayerHealth>();
+        PlayerHealth health = player.GetComponent<PlayerHealth>();
 
         if (health != null && health.IsDead)
             return;
@@ -77,13 +138,9 @@ public class ItemPickUp : NetworkBehaviour
         if (inventory == null)
             return;
 
-        // 成功获得道具，才让道具消失
-        if (inventory.ServerTryAdd(definition))
+        if (inventory.ServerTryAdd(item.id))
         {
-            Debug.Log(
-                $"Player {senderId} 获得 {definition.itemName}"
-            );
-
+            collected = true;
             NetworkObject.Despawn(true);
         }
     }

@@ -102,6 +102,16 @@ public class PlayerController : NetworkBehaviour
         moveInput = value.Get<Vector2>();
     }
 
+
+    public void OnSAttack(InputValue inputValue)
+    {
+        if (!IsSpawned || !IsOwner) return;
+        if (!inputValue.isPressed) return;
+
+        combat?.TrySAttack();
+        Debug.Log("SAtaack");
+    }
+
     public void OnAttack(InputValue value)
     {
         if (!IsSpawned || !IsOwner) return;

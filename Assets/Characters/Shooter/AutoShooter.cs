@@ -10,6 +10,8 @@ public class AutoShooter : MonoBehaviour
 
     [Header("Settings")]
     [SerializeField] private float fireInterval = 0.2f;
+    [SerializeField] private ParticleSystem muzzleFlash;
+
 
     private float nextFireTime;
 
@@ -32,5 +34,14 @@ public class AutoShooter : MonoBehaviour
             firePoint.position,
             firePoint.rotation
         );
+        if (muzzleFlash != null)
+        {
+            muzzleFlash.Stop(
+                true,
+                ParticleSystemStopBehavior.StopEmittingAndClear
+            );
+
+            muzzleFlash.Play(true);
+        }
     }
 }

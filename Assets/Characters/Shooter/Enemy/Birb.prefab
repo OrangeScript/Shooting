@@ -103,7 +103,15 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f5cd8ddfe7c27484ab39f2f44f1c3ec0,
         type: 3}
       insertIndex: -1
+      addedObject: {fileID: -8384056383656761591}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f5cd8ddfe7c27484ab39f2f44f1c3ec0,
+        type: 3}
+      insertIndex: -1
       addedObject: {fileID: 5096642564569956486}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f5cd8ddfe7c27484ab39f2f44f1c3ec0,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -4188412267027385704}
   m_SourcePrefab: {fileID: 100100000, guid: f5cd8ddfe7c27484ab39f2f44f1c3ec0, type: 3}
 --- !u!1 &206842276737358797 stripped
 GameObject:
@@ -145,10 +153,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 3
-  moveSpeed: 2
-  endZ: -1
-  animator: {fileID: 3542649869118820648}
   deathDuration: 1.2
+--- !u!114 &-8384056383656761591
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 206842276737358797}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d90915420951c4418d877b49cf9bf72, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animator: {fileID: 3542649869118820648}
+  walkState: Base Layer.Walk
+  dieState: Base Layer.Die
 --- !u!65 &5096642564569956486
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -170,3 +190,17 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 3.97, y: 4, z: 1.74}
   m_Center: {x: -0.0066161156, y: 2, z: 0.28}
+--- !u!114 &-4188412267027385704
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 206842276737358797}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df67d6d221eef8641bc0f89272abb864, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speed: 2
+  endZ: -1

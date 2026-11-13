@@ -13,6 +13,9 @@
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="TouchActionArea" picking-mode="Ignore" style="position: relative; width: 350px; height: 270px; flex-shrink: 0; margin-right: 36px; margin-bottom: 28px;">
+                <ui:VisualElement name="TouchSAttackButton" picking-mode="Position" focusable="false" style="position: absolute; left: 20px; top: 0; width: 112px; height: 112px; border-radius: 56px; border-width: 3px; border-color: rgba(195, 174, 255, 0.8); background-color: rgba(87, 56, 140, 0.4); align-items: center; justify-content: center;">
+                    <ui:Label text="SAttack" picking-mode="Ignore" style="margin: 0; padding: 0; font-size: 26px; color: rgb(239, 230, 255); -unity-text-align: middle-center;" />
+                </ui:VisualElement>
                 <ui:VisualElement name="TouchAttackButton" picking-mode="Position" focusable="false" style="position: absolute; left: 20px; bottom: 0; width: 136px; height: 136px; border-radius: 68px; border-width: 3px; border-color: rgba(255, 224, 174, 0.8); background-color: rgba(140, 91, 38, 0.4); align-items: center; justify-content: center;">
                     <ui:Label text="攻击" picking-mode="Ignore" style="margin: 0; padding: 0; font-size: 34px; color: rgb(255, 245, 225); -unity-text-align: middle-center;" />
                 </ui:VisualElement>

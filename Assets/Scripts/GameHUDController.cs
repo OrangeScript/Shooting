@@ -43,6 +43,7 @@ public class GameHUDController : MonoBehaviour
         actionButtons = new[]
         {
             root.Q<VisualElement>("TouchAttackButton"),
+            root.Q<VisualElement>("TouchSAttackButton"),
             root.Q<VisualElement>("TouchKickButton"),
             root.Q<VisualElement>("TouchJumpButton")
         };
@@ -230,6 +231,7 @@ public class GameHUDController : MonoBehaviour
         switch (button.name)
         {
             case "TouchAttackButton": localController?.RequestAttack(); break;
+            case "TouchSAttackButton": localController?.RequestSAttack(); break;
             case "TouchKickButton": localController?.RequestKick(); break;
             case "TouchJumpButton": localController?.RequestJump(); break;
         }

@@ -109,6 +109,12 @@ public class PlayerController : NetworkBehaviour
             combat?.TryAttack();
     }
 
+    public void RequestSAttack()
+    {
+        if (CanUseAction)
+            combat?.TrySAttack();
+    }
+
     public override void OnNetworkSpawn()
     {
         // 只有角色拥有者启用输入
@@ -139,10 +145,8 @@ public class PlayerController : NetworkBehaviour
 
     public void OnSAttack(InputValue inputValue)
     {
-        if (!IsSpawned || !IsOwner) return;
-        if (!inputValue.isPressed) return;
-
-        combat?.TrySAttack();
+        if (inputValue.isPressed)
+            RequestSAttack();
     }
 
     public void OnAttack(InputValue value)

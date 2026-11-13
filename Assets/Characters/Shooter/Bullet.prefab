@@ -130,3 +130,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 20
   lifetime: 3
+  trail: {fileID: 0}
+  damage: 1
+  enemyMask:
+    serializedVersion: 2
+    m_Bits: 128

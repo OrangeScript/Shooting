@@ -10,6 +10,12 @@ public class Bullet : MonoBehaviour
     private BulletPool pool;
     private float remainingLifetime;
 
+    [SerializeField] private int damage = 1;
+
+    [Header("命中检测")]
+    [SerializeField] private LayerMask enemyMask;
+
+
     // 每次发射都要重新初始化
     public void Launch(
         BulletPool ownerPool,
@@ -32,8 +38,29 @@ public class Bullet : MonoBehaviour
 
     private void Update()
     {
-        transform.position +=
-            transform.forward * speed * Time.deltaTime;
+
+        float distance = speed * Time.deltaTime;
+        Vector3 direction = transform.forward;
+
+        // 只检测 Enemy Layer，包含 Trigger Collider
+        if (Physics.Raycast(
+            transform.position,
+            direction,
+            out RaycastHit hit,
+            distance,
+            enemyMask,
+            QueryTriggerInteraction.Collide))
+        {
+            Enemy enemy =
+                hit.collider.GetComponentInParent<Enemy>();
+
+            if (enemy != null)
+                enemy.TakeDamage(damage);
+
+            pool.Release(this);
+            return;
+        }
+        transform.position += direction* distance;
 
         remainingLifetime -= Time.deltaTime;
 

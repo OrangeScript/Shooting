@@ -13,11 +13,13 @@ public class GamerController : MonoBehaviour
 
     private float horizontalInput;
     private float verticalVelocity;
+    private ShooterPlayerHealth health;
 
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
         playerInput = GetComponent<PlayerInput>();
+        health = GetComponent<ShooterPlayerHealth>();
     }
 
 
@@ -35,7 +37,8 @@ public class GamerController : MonoBehaviour
     private void Update()
     {
 
-
+        if (health != null && health.IsDead)
+        return;
         // 仅允许 X 轴移动
         Vector3 velocity = new Vector3(
             horizontalInput * moveSpeed,

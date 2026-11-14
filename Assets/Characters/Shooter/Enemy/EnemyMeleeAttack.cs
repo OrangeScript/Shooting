@@ -72,11 +72,11 @@ public class EnemyMeleeAttack : MonoBehaviour
             !IsInRange(player))
             return false;
 
-        // ShooterPlayerHealth playerHealth =
-        //     player.GetComponent<ShooterPlayerHealth>();
+        ShooterPlayerHealth playerHealth =
+            player.GetComponent<ShooterPlayerHealth>();
 
-        // if (playerHealth == null || playerHealth.IsDead)
-        //     return false;
+        if (playerHealth == null || playerHealth.IsDead)
+            return false;
 
         StartCoroutine(AttackRoutine(player));
         return true;
@@ -110,14 +110,14 @@ public class EnemyMeleeAttack : MonoBehaviour
         // 命中时重新检测位置：允许玩家躲避攻击
         if (IsInRange(player))
         {
-            // ShooterPlayerHealth health =
-            //     player.GetComponent<ShooterPlayerHealth>();
+            ShooterPlayerHealth health =
+                player.GetComponent<ShooterPlayerHealth>();
 
-            // if (health != null && !health.IsDead)
-            // {
-            //     health.TakeDamage(damage);
-            //     Debug.Log("MiniBoss 近战命中玩家！");
-            // }
+            if (health != null && !health.IsDead)
+            {
+                health.TakeDamage(damage);
+                Debug.Log("MiniBoss 近战命中玩家！");
+            }
         }
         else
         {

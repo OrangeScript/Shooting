@@ -15,8 +15,17 @@ public class AutoShooter : MonoBehaviour
 
     private float nextFireTime;
 
+    private ShooterPlayerHealth shooterHealth;
+
+    private void Awake()
+    {
+        shooterHealth = GetComponent<ShooterPlayerHealth>();
+    }
+
     private void Update()
     {
+        if (shooterHealth != null && shooterHealth.IsDead)
+            return;
         if (Time.time < nextFireTime)
             return;
 
@@ -32,7 +41,8 @@ public class AutoShooter : MonoBehaviour
 
         bulletPool.Spawn(
             firePoint.position,
-            firePoint.rotation
+            firePoint.rotation,
+            shooterHealth
         );
         if (muzzleFlash != null)
         {

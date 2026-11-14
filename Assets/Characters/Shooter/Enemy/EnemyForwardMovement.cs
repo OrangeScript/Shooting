@@ -23,6 +23,6 @@ public class EnemyForwardMovement : MonoBehaviour
             Vector3.back * speed * Time.deltaTime;
 
         if (transform.position.z <= endZ)
-            enemy.ReachEnd();
+            enemy.ReachEnd(FindObjectOfType<ShooterPlayerHealth>());
     }
 }

@@ -25,6 +25,8 @@ public class Enemy : MonoBehaviour
     private bool[] initialColliderStates;
 
     public bool IsAlive { get; private set; }
+    [Header("接触伤害")]
+    [SerializeField, Min(1)] private int damage = 1;
 
     private void Awake()
     {
@@ -65,7 +67,7 @@ public class Enemy : MonoBehaviour
 
 
    
-    public void TakeDamage(int damage)
+    public void TakeDamage(int damage,ShooterPlayerHealth attacker = null)
     {
         if (!IsAlive || damage <= 0)
             return;
@@ -77,13 +79,17 @@ public class Enemy : MonoBehaviour
         Debug.Log($"{name} HP: {currentHealth}");
 
         if (currentHealth == 0)
-            Die();
+            Die(attacker);
     }
     
 
-    private void Die()
+    private void Die(ShooterPlayerHealth killer)
     {
+        if(!IsAlive) return;
         IsAlive = false;
+
+        if (killer != null)
+        killer.GainMaxHealth(Mathf.Max(1, maxHealth));
 
         foreach (Collider hitbox in hitboxes)
         {
@@ -102,10 +108,11 @@ public class Enemy : MonoBehaviour
         Recycle();
     }
 
-    public void ReachEnd()
+    public void ReachEnd(ShooterPlayerHealth health)
     {
         if (!IsAlive)
             return;
+        health.TakeDamage(damage);
 
         Debug.Log($"{name} 到达终点");
         Recycle();

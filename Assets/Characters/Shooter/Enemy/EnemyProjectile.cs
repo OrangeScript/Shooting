@@ -39,11 +39,11 @@ public class EnemyProjectile : MonoBehaviour
             playerMask,
             QueryTriggerInteraction.Collide))
         {
-            // ShooterPlayerHealth health =
-            //     hit.collider.GetComponentInParent<ShooterPlayerHealth>();
+            ShooterPlayerHealth health =
+                hit.collider.GetComponentInParent<ShooterPlayerHealth>();
 
-            // if (health != null)
-            //     health.TakeDamage(damage);
+            if (health != null)
+                health.TakeDamage(damage);
 
             Destroy(gameObject);
             return;

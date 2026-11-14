@@ -19,14 +19,16 @@ public class Bullet : MonoBehaviour
     private Collider[] overlapHits = new Collider[8];
     private bool inFlight;
     private static int lastPhysicsSyncFrame = -1;
+    private ShooterPlayerHealth shooter;
 
     // 每次发射都要重新初始化
     public void Launch(
         BulletPool ownerPool,
         Vector3 position,
-        Quaternion rotation)
+        Quaternion rotation,ShooterPlayerHealth shooter)
     {
         pool = ownerPool;
+        this.shooter = shooter;
 
         transform.SetPositionAndRotation(position, rotation);
 
@@ -73,7 +75,7 @@ public class Bullet : MonoBehaviour
                 hit.collider.GetComponentInParent<Enemy>();
 
             if (enemy != null)
-                enemy.TakeDamage(damage);
+                enemy.TakeDamage(damage,shooter);
 
             Recycle();
             return;
@@ -105,7 +107,7 @@ public class Bullet : MonoBehaviour
                 if (enemy == null || !enemy.IsAlive)
                     continue;
 
-                enemy.TakeDamage(damage);
+                enemy.TakeDamage(damage,shooter);
                 Recycle();
                 return true;
             }

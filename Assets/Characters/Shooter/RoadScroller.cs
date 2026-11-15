@@ -1,4 +1,5 @@
 
+using System;
 using UnityEngine;
 
 [RequireComponent(typeof(Renderer))]
@@ -15,9 +16,11 @@ public class RoadScroller : MonoBehaviour
     private Material roadMaterial;
     private Vector2 offset;
     private int texturePropertyID;
+    [SerializeField] ShooterPlayerHealth health;
 
     private void Awake()
     {
+        
         Renderer roadRenderer = GetComponent<Renderer>();
 
         // 获取运行时独立材质，不修改原始材质资源
@@ -34,6 +37,26 @@ public class RoadScroller : MonoBehaviour
         }
 
         offset = roadMaterial.GetTextureOffset(texturePropertyID);
+    }
+
+    void OnEnable()
+    {
+        health.Died += OnPlayerDie;
+    }
+
+    private void OnDisable()
+    {
+        if (health != null)
+        {
+            // 取消监听，避免重复订阅
+            health.Died -= OnPlayerDie;
+        }
+    }
+
+    private void OnPlayerDie()
+    {
+        SetScrolling(false);
+        Debug.Log("玩家死亡，道路停止滚动");
     }
 
     private void Update()

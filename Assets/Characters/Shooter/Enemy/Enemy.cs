@@ -27,6 +27,13 @@ public class Enemy : MonoBehaviour
     public bool IsAlive { get; private set; }
     [Header("接触伤害")]
     [SerializeField, Min(1)] private int damage = 1;
+    public int MaxHealth => Mathf.Max(1, maxHealth);
+    public int CurrentHealth => currentHealth;
+
+    [Header("头顶血量位置")]
+    [SerializeField] private Transform healthAnchor;
+
+    public Transform HealthAnchor => healthAnchor;
 
     private void Awake()
     {
@@ -63,6 +70,7 @@ public class Enemy : MonoBehaviour
         }
 
         enemyAnimation?.PlayWalk();
+        EnemyHealthUI.Instance.Register(this);
     }
 
 
@@ -98,7 +106,7 @@ public class Enemy : MonoBehaviour
         }
 
         enemyAnimation?.PlayDie();
-
+        EnemyHealthUI.Instance?.Unregister(this);
         StartCoroutine(DeathAndRecycle());
     }
 
@@ -121,6 +129,7 @@ public class Enemy : MonoBehaviour
     private void Recycle()
     {
         IsAlive = false;
+        EnemyHealthUI.Instance?.Unregister(this);
 
         if (pool != null)
             pool.Release(this);

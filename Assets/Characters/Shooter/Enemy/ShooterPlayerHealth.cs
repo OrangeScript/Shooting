@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Animations;
 using UnityEngine;
 
 [DisallowMultipleComponent]
@@ -19,11 +20,13 @@ public class ShooterPlayerHealth : MonoBehaviour
     // 参数分别是：当前血量、最大血量
     public event Action<int, int> HealthChanged;
     public event Action Died;
+    Animator animator;
 
     private void Awake()
     {
         MaxHealth = startingMaxHealth;
         CurrentHealth = MaxHealth;
+        animator = GetComponentInChildren<Animator>();
     }
 
     private void Start()
@@ -43,6 +46,7 @@ public class ShooterPlayerHealth : MonoBehaviour
         if (IsDead)
         {
             Debug.Log("玩家死亡");
+            animator.SetTrigger("Die");
             Died?.Invoke();
         }
     }

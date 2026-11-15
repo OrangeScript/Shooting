@@ -1,0 +1,31 @@
+
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+
+    <Style src="ShooterHUD.uss" />
+
+    <ui:VisualElement
+        name="HUDRoot"
+        picking-mode="Ignore">
+
+        <ui:Label
+            name="HealthText"
+            text="HP 10 / 10"
+            picking-mode="Ignore" />
+
+        <ui:VisualElement
+            name="HealthBarBG"
+            picking-mode="Ignore">
+
+            <ui:VisualElement
+                name="GrowthFill"
+                picking-mode="Ignore" />
+
+            <ui:VisualElement
+                name="HealthFill"
+                picking-mode="Ignore" />
+
+        </ui:VisualElement>
+
+    </ui:VisualElement>
+
+</ui:UXML>

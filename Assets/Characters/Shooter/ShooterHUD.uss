@@ -1,0 +1,96 @@
+
+/* HUD 全屏容器 */
+#HUDRoot {
+    position: absolute;
+
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+
+    overflow: visible;
+}
+
+/* 生命值数字 */
+#HealthText {
+    position: absolute;
+
+    bottom: 70px;
+    left: 0;
+
+    width: 240px;
+    height: 28px;
+
+    font-size: 20px;
+    color: white;
+
+    -unity-text-align: middle-center;
+    -unity-font-style: bold;
+}
+
+/* 深色血条背景 */
+#HealthBarBG {
+    position: absolute;
+
+    bottom: 38px;
+    left: 0;
+
+    width: 120px;
+    height: 22px;
+
+    flex-grow: 0;
+    flex-shrink: 0;
+
+    background-color: rgb(50, 55, 65);
+
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+/* 新获得的绿色生命 */
+#GrowthFill {
+    position: absolute;
+
+    left: 0;
+    top: 0;
+
+    width: 0px;
+    height: 100%;
+
+    background-color: rgb(85, 235, 115);
+}
+
+/* 红色实际生命 */
+#HealthFill {
+    position: absolute;
+
+    left: 0;
+    top: 0;
+
+    width: 120px;
+    height: 100%;
+
+    background-color: rgb(255, 85, 100);
+}
+
+
+
+/* 精英怪头顶生命值 */
+.enemy-hp-number {
+    position: absolute;
+
+    width: 88px;
+    height: 30px;
+
+    font-size: 20px;
+    color: rgb(255, 225, 140);
+
+    -unity-text-align: middle-center;
+    -unity-font-style: bold;
+
+    background-color: rgba(20, 22, 30, 0.72);
+    border-radius: 7px;
+
+    flex-grow: 0;
+    flex-shrink: 0;
+}

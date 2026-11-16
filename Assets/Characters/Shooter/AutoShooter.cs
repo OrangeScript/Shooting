@@ -17,9 +17,16 @@ public class AutoShooter : MonoBehaviour
 
     private ShooterPlayerHealth shooterHealth;
 
+    [Header("基础子弹伤害")]
+    [SerializeField, Min(1)]
+    private int baseDamage = 1;
+
+    private ShooterCombatStats combatStats;
+
     private void Awake()
     {
         shooterHealth = GetComponent<ShooterPlayerHealth>();
+        combatStats = GetComponent<ShooterCombatStats>();
     }
 
     private void Update()
@@ -39,10 +46,20 @@ public class AutoShooter : MonoBehaviour
         if (bulletPool == null || firePoint == null)
             return;
 
+        ShooterAttackContext attack = new ShooterAttackContext
+        {
+            Owner = shooterHealth,
+            Source = ShooterAttackSource.PlayerBullet,
+
+            Damage = combatStats != null
+                ? combatStats.CalculateDamage(baseDamage)
+                : baseDamage
+        };
+
         bulletPool.Spawn(
             firePoint.position,
             firePoint.rotation,
-            shooterHealth
+            attack
         );
         if (muzzleFlash != null)
         {

@@ -31,7 +31,7 @@ public class BulletPool : MonoBehaviour
     }
 
     // 从对象池取出一颗子弹并发射
-    public void Spawn(Vector3 position, Quaternion rotation,ShooterPlayerHealth shooter)
+    public void Spawn(Vector3 position, Quaternion rotation,ShooterAttackContext attack)
     {
         Bullet bullet;
 
@@ -46,7 +46,7 @@ public class BulletPool : MonoBehaviour
             bullet = CreateBullet();
         }
 
-        bullet.Launch(this, position, rotation,shooter);
+        bullet.Launch(this, position, rotation,attack);
     }
 
     // 回收子弹

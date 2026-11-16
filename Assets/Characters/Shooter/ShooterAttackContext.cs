@@ -17,9 +17,4 @@ public struct ShooterAttackContext
 
     // 攻击来源
     public ShooterAttackSource Source;
-
-    // 闪电效果
-    public float LightningChance;
-    public int MaxBounces;
-    public float BounceRadius;
 }

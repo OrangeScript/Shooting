@@ -37,4 +37,10 @@ public class ShooterInventory : MonoBehaviour
     {
         Debug.Log($"添加 Lightning: {TryAdd(2006)}");
     }
+
+    [ContextMenu("Test / Add Bullet")]
+    private void TestAddBullet()
+    {
+        Debug.Log($"添加 Bullet: {TryAdd(2005)}");
+    }
 }

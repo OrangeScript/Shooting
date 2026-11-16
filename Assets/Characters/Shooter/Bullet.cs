@@ -10,7 +10,6 @@ public class Bullet : MonoBehaviour
     private BulletPool pool;
     private float remainingLifetime;
 
-    [SerializeField] private int damage = 1;
 
     [Header("命中检测")]
     [SerializeField] private LayerMask enemyMask;
@@ -19,16 +18,16 @@ public class Bullet : MonoBehaviour
     private Collider[] overlapHits = new Collider[8];
     private bool inFlight;
     private static int lastPhysicsSyncFrame = -1;
-    private ShooterPlayerHealth shooter;
+    private ShooterAttackContext attacker;
 
     // 每次发射都要重新初始化
     public void Launch(
         BulletPool ownerPool,
         Vector3 position,
-        Quaternion rotation,ShooterPlayerHealth shooter)
+        Quaternion rotation,ShooterAttackContext attack)
     {
         pool = ownerPool;
-        this.shooter = shooter;
+        this.attacker = attack;
 
         transform.SetPositionAndRotation(position, rotation);
 
@@ -75,7 +74,7 @@ public class Bullet : MonoBehaviour
                 hit.collider.GetComponentInParent<Enemy>();
 
             if (enemy != null)
-                enemy.TakeDamage(damage,shooter);
+                ApplyHit(enemy);
 
             Recycle();
             return;
@@ -107,7 +106,7 @@ public class Bullet : MonoBehaviour
                 if (enemy == null || !enemy.IsAlive)
                     continue;
 
-                enemy.TakeDamage(damage,shooter);
+                ApplyHit(enemy);
                 Recycle();
                 return true;
             }
@@ -128,4 +127,22 @@ public class Bullet : MonoBehaviour
         inFlight = false;
         pool.Release(this);
     }
+
+
+    private void ApplyHit(Enemy enemy)
+    {
+        if (enemy == null || !enemy.IsAlive)
+            return;
+
+        enemy.TakeDamage(
+            attacker.Damage,
+            attacker.Owner
+        );
+
+        Debug.Log(
+            $"[{attacker.Source}] 击中 {enemy.name}，" +
+            $"造成 {attacker.Damage} 伤害"
+        );
+    }
+
 }

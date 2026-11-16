@@ -4,7 +4,7 @@ using UnityEngine;
 public abstract class ItemEffectDefinition : ScriptableObject
 {
     // 生成一个独立的运行时效果实例。
-    // 这里不保存当前玩家的状态。
+// 这里不保存当前玩家的状态。
     public abstract IItemEffectRuntime CreateRuntime(
         ItemRuntimeContext context
     );

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(ShooterInventory))]
+[RequireComponent(typeof(ShooterCombatPipeline))]
 public class ShooterItemRuntime : MonoBehaviour
 {
     private ShooterInventory inventory;
@@ -11,6 +12,12 @@ public class ShooterItemRuntime : MonoBehaviour
     private readonly Dictionary<int, List<IItemEffectRuntime>>
         activeEffects = new();
 
+    private ShooterCombatPipeline combatPipeline;
+
+    private void Awake()
+    {
+        combatPipeline = GetComponent<ShooterCombatPipeline>();
+    }
     private void Start()
     {
         inventory = GetComponent<ShooterInventory>();
@@ -32,8 +39,7 @@ public class ShooterItemRuntime : MonoBehaviour
 
         foreach (var effects in activeEffects.Values)
         {
-            foreach (var effect in effects)
-                effect.Dispose();
+            ReleaseEffects(effects);
         }
 
         activeEffects.Clear();
@@ -58,7 +64,7 @@ public class ShooterItemRuntime : MonoBehaviour
         {
             foreach (var runtime in activeEffects[id])
                 runtime.Dispose();
-
+            ReleaseEffects(activeEffects[id]);
             activeEffects.Remove(id);
         }
 
@@ -108,6 +114,28 @@ public class ShooterItemRuntime : MonoBehaviour
 
             if (runtime != null)
                 output.Add(runtime);
+            
+            if (runtime is IProjectileHitEffect hitEffect)
+            {
+                combatPipeline.Register(hitEffect);
+            }
         }
     }
+
+
+        private void ReleaseEffects(
+            List<IItemEffectRuntime> runtimes)
+        {
+            foreach (var runtime in runtimes)
+            {
+                if (runtime is IProjectileHitEffect hitEffect &&
+                    combatPipeline != null)
+                {
+                    combatPipeline.Unregister(hitEffect);
+                }
+
+                runtime.Dispose();
+            }
+        }
+
 }

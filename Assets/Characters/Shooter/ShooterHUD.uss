@@ -47,8 +47,11 @@
     overflow: hidden;
 }
 
-/* 新获得的绿色生命 */
-#GrowthFill {
+/* 上一层底色、当前层和两段跨层回血共用固定容器 */
+#LayerBaseFill,
+#HealthFill,
+#GrowthFill,
+#GrowthWrapFill {
     position: absolute;
 
     left: 0;
@@ -57,22 +60,21 @@
     width: 0px;
     height: 100%;
 
-    background-color: rgb(85, 235, 115);
+    flex-grow: 0;
+    flex-shrink: 0;
 }
 
-/* 红色实际生命 */
+/* 实际血量的RGB由脚本按层数逐渐调深 */
+#LayerBaseFill,
 #HealthFill {
-    position: absolute;
-
-    left: 0;
-    top: 0;
-
-    width: 120px;
-    height: 100%;
-
     background-color: rgb(255, 85, 100);
 }
 
+/* 回血先以绿色显示，再由当前层颜色覆盖 */
+#GrowthFill,
+#GrowthWrapFill {
+    background-color: rgb(85, 235, 115);
+}
 
 
 /* 精英怪头顶生命值 */

@@ -17,11 +17,19 @@
             picking-mode="Ignore">
 
             <ui:VisualElement
-                name="GrowthFill"
+                name="LayerBaseFill"
                 picking-mode="Ignore" />
 
             <ui:VisualElement
                 name="HealthFill"
+                picking-mode="Ignore" />
+
+            <ui:VisualElement
+                name="GrowthFill"
+                picking-mode="Ignore" />
+
+            <ui:VisualElement
+                name="GrowthWrapFill"
                 picking-mode="Ignore" />
 
         </ui:VisualElement>

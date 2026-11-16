@@ -1,67 +1,65 @@
-
 using UnityEngine;
 using UnityEngine.UIElements;
 
 [RequireComponent(typeof(UIDocument))]
 public class ShooterHealthHUD : MonoBehaviour
 {
+    private const float HealthPerLayer = 100f;
+
     [Header("Player")]
-    [SerializeField]
-    private ShooterPlayerHealth player;
+    [SerializeField] private ShooterPlayerHealth player;
 
-    [Header("血条成长")]
-    [SerializeField, Min(1f)]
-    private float pixelsPerHP = 12f;
+    [Header("血条成长（长度最多容纳100点）")]
+    [SerializeField, Min(1f)] private float pixelsPerHP = 12f;
+    [SerializeField, Min(0.01f)] private float greenGrowDuration = 0.35f;
+    [Tooltip("当前血量层的颜色覆盖绿色的时间。")]
+    [SerializeField, Min(0.01f)] private float redCoverDuration = 0.8f;
+    [SerializeField, Min(0.01f)] private float normalChangeDuration = 0.15f;
 
-    [SerializeField, Min(0.01f)]
-    private float greenGrowDuration = 0.35f;
-
-    [SerializeField, Min(0.01f)]
-    private float redCoverDuration = 0.8f;
-
-    [SerializeField, Min(0.01f)]
-    private float normalChangeDuration = 0.15f;
+    [Header("每100点叠一层，RGB逐层变深")]
+    [SerializeField] private Color firstLayerColor = new Color32(255, 85, 100, 255);
+    [SerializeField, Min(0.01f)] private float layerDarkening = 0.22f;
 
     private VisualElement root;
     private VisualElement healthBarBG;
-    private VisualElement growthFill;
+    private VisualElement layerBaseFill;
     private VisualElement healthFill;
+    private VisualElement growthFill;
+    private VisualElement growthWrapFill;
     private Label healthText;
 
     private enum Phase
     {
         Idle,
         GrowGreen,
-        CoverRed,
-        ChangeRed
+        CoverColor,
+        ChangeHealth
     }
 
-    private Phase phase = Phase.Idle;
+    private Phase phase;
     private float elapsed;
 
-    // 当前画面上实际显示的宽度
+    // 用血量而不是像素记录动画，跨100点时仍然连续向前。
+    private float displayedHealth;
+    private float growthHealth;
+    private float targetHealth;
+    private float startHealth;
+    private float startGrowthHealth;
+
+    // 不足100点时保留长度成长；达到100点后只增加颜色层。
+    private float displayedCapacity;
+    private float targetCapacity;
+    private float startCapacity;
     private float displayedBarWidth;
-    private float displayedRedWidth;
-
-    // 本次动画的目标宽度
-    private float targetBarWidth;
-    private float targetRedWidth;
-
-    // 动画起点
-    private float startBarWidth;
-    private float startRedWidth;
 
     private int lastHP;
     private int lastMaxHP;
-
     private bool started;
 
     private void OnEnable()
     {
-        UIDocument document = GetComponent<UIDocument>();
-
+        var document = GetComponent<UIDocument>();
         root = document.rootVisualElement.Q<VisualElement>("HUDRoot");
-
         if (root == null)
         {
             Debug.LogError("找不到 HUDRoot", this);
@@ -69,24 +67,20 @@ public class ShooterHealthHUD : MonoBehaviour
         }
 
         healthBarBG = root.Q<VisualElement>("HealthBarBG");
-        growthFill = root.Q<VisualElement>("GrowthFill");
+        layerBaseFill = root.Q<VisualElement>("LayerBaseFill");
         healthFill = root.Q<VisualElement>("HealthFill");
+        growthFill = root.Q<VisualElement>("GrowthFill");
+        growthWrapFill = root.Q<VisualElement>("GrowthWrapFill");
         healthText = root.Q<Label>("HealthText");
 
-        if (healthBarBG == null ||
-            growthFill == null ||
-            healthFill == null ||
-            healthText == null)
+        if (healthBarBG == null || layerBaseFill == null || healthFill == null ||
+            growthFill == null || growthWrapFill == null || healthText == null)
         {
             Debug.LogError("ShooterHUD 缺少血条元素", this);
             return;
         }
 
-        // 监听窗口尺寸变化
-        root.RegisterCallback<GeometryChangedEvent>(
-            OnRootGeometryChanged
-        );
-
+        root.RegisterCallback<GeometryChangedEvent>(OnRootGeometryChanged);
         if (started)
             BindPlayer();
     }
@@ -102,16 +96,15 @@ public class ShooterHealthHUD : MonoBehaviour
         if (player == null)
             player = FindObjectOfType<ShooterPlayerHealth>();
 
-        if (player == null || healthBarBG == null)
+        if (player == null || healthBarBG == null || layerBaseFill == null ||
+            healthFill == null || growthFill == null || growthWrapFill == null || healthText == null)
         {
             Debug.LogError("找不到玩家血量组件或血条 UI", this);
             return;
         }
 
-        // 防止重复订阅
         player.HealthChanged -= OnHealthChanged;
         player.HealthChanged += OnHealthChanged;
-
         InitializeBar(player.CurrentHealth, player.MaxHealth);
     }
 
@@ -119,226 +112,221 @@ public class ShooterHealthHUD : MonoBehaviour
     {
         if (player != null)
             player.HealthChanged -= OnHealthChanged;
-
         if (root != null)
-        {
-            root.UnregisterCallback<GeometryChangedEvent>(
-                OnRootGeometryChanged
-            );
-        }
+            root.UnregisterCallback<GeometryChangedEvent>(OnRootGeometryChanged);
+        phase = Phase.Idle;
     }
 
-    // 首次显示：直接设置长度，不播放成长动画
     private void InitializeBar(int current, int max)
     {
-        lastHP = current;
-        lastMaxHP = max;
-
-        targetBarWidth = Mathf.Max(1, max) * pixelsPerHP;
-        targetRedWidth =
-            Mathf.Clamp(current, 0, max) * pixelsPerHP;
-
-        displayedBarWidth = targetBarWidth;
-        displayedRedWidth = targetRedWidth;
-
-        growthFill.style.width = 0f;
-
+        lastMaxHP = Mathf.Max(1, max);
+        lastHP = Mathf.Clamp(current, 0, lastMaxHP);
+        displayedHealth = growthHealth = targetHealth = lastHP;
+        displayedCapacity = targetCapacity = Mathf.Min(lastMaxHP, HealthPerLayer);
         phase = Phase.Idle;
         elapsed = 0f;
-
-        healthText.text = $"HP {current} / {max}";
-
+        UpdateHealthText();
         ApplyVisuals();
     }
 
-    // 由 ShooterPlayerHealth.HealthChanged 触发
     private void OnHealthChanged(int current, int max)
     {
-        bool maxIncreased = max > lastMaxHP;
-        bool hpIncreased = current > lastHP;
+        max = Mathf.Max(1, max);
+        current = Mathf.Clamp(current, 0, max);
+        if (current == lastHP && max == lastMaxHP)
+            return;
 
+        int previousHP = lastHP;
         lastHP = current;
         lastMaxHP = max;
+        targetHealth = current;
+        targetCapacity = Mathf.Min(max, HealthPerLayer);
+        UpdateHealthText();
 
-        targetBarWidth = Mathf.Max(1, max) * pixelsPerHP;
-        targetRedWidth =
-            Mathf.Clamp(current, 0, max) * pixelsPerHP;
-
-        healthText.text = $"HP {current} / {max}";
-
-        elapsed = 0f;
-
-        if (maxIncreased && hpIncreased)
+        if (current > previousHP)
         {
-            // 击杀成长：先绿后红
-            startBarWidth = displayedBarWidth;
-            startRedWidth = displayedRedWidth;
+            // 受伤动画尚未结束就回血时，先结算先前的伤害，避免从虚高血量继续增长。
+            if (phase == Phase.ChangeHealth)
+            {
+                displayedHealth = Mathf.Min(displayedHealth, previousHP);
+                growthHealth = displayedHealth;
+            }
 
+            startHealth = displayedHealth;
+            startGrowthHealth = Mathf.Clamp(
+                Mathf.Max(displayedHealth, growthHealth), displayedHealth, targetHealth);
+            growthHealth = startGrowthHealth;
             phase = Phase.GrowGreen;
+        }
+        else if (current < previousHP)
+        {
+            // 受伤立即取消旧回血目标；此后只能向最新的血量下降。
+            displayedHealth = Mathf.Max(targetHealth, Mathf.Max(displayedHealth, growthHealth));
+            growthHealth = displayedHealth;
+            startHealth = displayedHealth;
+            phase = Phase.ChangeHealth;
+        }
+        else if (phase != Phase.Idle)
+        {
+            // 仅增加血量上限，不伪造绿色回血，也不打断正在进行的回血覆盖。
+            displayedCapacity = startCapacity = targetCapacity;
+            ApplyVisuals();
+            return;
         }
         else
         {
-            // 普通受伤 / 治疗 / 仅增加上限
-            startRedWidth = displayedRedWidth;
-            displayedBarWidth = targetBarWidth;
-
-            growthFill.style.width = 0f;
-            phase = Phase.ChangeRed;
+            startHealth = displayedHealth;
+            growthHealth = displayedHealth;
+            phase = Phase.ChangeHealth;
         }
 
+        startCapacity = displayedCapacity;
+        elapsed = 0f;
         ApplyVisuals();
     }
 
     private void Update()
     {
-        if (phase == Phase.Idle)
-            return;
+        if (phase != Phase.Idle)
+            AdvanceAnimation(Time.unscaledDeltaTime);
+    }
 
-        elapsed += Time.unscaledDeltaTime;
-
-        switch (phase)
+    private void AdvanceAnimation(float deltaTime)
+    {
+        float remaining = Mathf.Max(0f, deltaTime);
+        while (phase != Phase.Idle)
         {
-            case Phase.GrowGreen:
-                UpdateGreenGrowth();
+            float duration = Mathf.Max(0.01f, phase == Phase.GrowGreen
+                ? greenGrowDuration
+                : phase == Phase.CoverColor ? redCoverDuration : normalChangeDuration);
+            float step = Mathf.Min(remaining, Mathf.Max(0f, duration - elapsed));
+            remaining -= step;
+            elapsed += step;
+            float t = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(elapsed / duration));
+
+            if (phase == Phase.GrowGreen)
+            {
+                displayedHealth = startHealth;
+                growthHealth = Mathf.Lerp(startGrowthHealth, targetHealth, t);
+            }
+            else
+            {
+                displayedHealth = Mathf.Lerp(startHealth, targetHealth, t);
+                growthHealth = phase == Phase.CoverColor ? targetHealth : displayedHealth;
+            }
+
+            displayedCapacity = Mathf.Lerp(startCapacity, targetCapacity, t);
+            if (elapsed < duration)
                 break;
 
-            case Phase.CoverRed:
-                UpdateRedCover();
-                break;
+            elapsed = 0f;
+            displayedCapacity = targetCapacity;
+            if (phase == Phase.GrowGreen)
+            {
+                growthHealth = targetHealth;
+                startHealth = displayedHealth;
+                startCapacity = displayedCapacity;
+                phase = Phase.CoverColor;
+            }
+            else
+            {
+                displayedHealth = growthHealth = targetHealth;
+                phase = Phase.Idle;
+            }
 
-            case Phase.ChangeRed:
-                UpdateNormalChange();
+            if (remaining <= 0f)
                 break;
         }
 
         ApplyVisuals();
     }
 
-    private void UpdateGreenGrowth()
+    private void UpdateHealthText()
     {
-        float t = Mathf.Clamp01(
-            elapsed / greenGrowDuration
-        );
-
-        float smooth = Mathf.SmoothStep(0f, 1f, t);
-
-        // 1. 整条血条增长
-        displayedBarWidth = Mathf.Lerp(
-            startBarWidth,
-            targetBarWidth,
-            smooth
-        );
-
-        // 2. 绿色从原有的红色末端长出来
-        float greenEnd = Mathf.Lerp(
-            startRedWidth,
-            targetRedWidth,
-            smooth
-        );
-
-        growthFill.style.left = startRedWidth;
-        growthFill.style.width =
-            Mathf.Max(0f, greenEnd - startRedWidth);
-
-        // 3. 红色保持不动
-        displayedRedWidth = startRedWidth;
-
-        if (t >= 1f)
-        {
-            phase = Phase.CoverRed;
-            elapsed = 0f;
-        }
-    }
-
-    private void UpdateRedCover()
-    {
-        float t = Mathf.Clamp01(
-            elapsed / redCoverDuration
-        );
-
-        float smooth = Mathf.SmoothStep(0f, 1f, t);
-
-        // 绿色维持完全展开的状态
-        growthFill.style.left = startRedWidth;
-        growthFill.style.width =
-            Mathf.Max(0f, targetRedWidth - startRedWidth);
-
-        // 红色逐渐覆盖绿色
-        displayedRedWidth = Mathf.Lerp(
-            startRedWidth,
-            targetRedWidth,
-            smooth
-        );
-
-        if (t >= 1f)
-        {
-            displayedRedWidth = targetRedWidth;
-            growthFill.style.width = 0f;
-            phase = Phase.Idle;
-        }
-    }
-
-    private void UpdateNormalChange()
-    {
-        float t = Mathf.Clamp01(
-            elapsed / normalChangeDuration
-        );
-
-        float smooth = Mathf.SmoothStep(0f, 1f, t);
-
-        displayedRedWidth = Mathf.Lerp(
-            startRedWidth,
-            targetRedWidth,
-            smooth
-        );
-
-        if (t >= 1f)
-        {
-            displayedRedWidth = targetRedWidth;
-            phase = Phase.Idle;
-        }
+        healthText.text = $"HP {lastHP} / {lastMaxHP}";
     }
 
     private void ApplyVisuals()
     {
-        if (healthBarBG == null)
+        if (healthBarBG == null || layerBaseFill == null || healthFill == null ||
+            growthFill == null || growthWrapFill == null)
             return;
 
-        // 整条血条的宽度：随 MaxHealth 不断变长
+        float capacity = Mathf.Clamp(displayedCapacity, 1f, HealthPerLayer);
+        displayedBarWidth = capacity * Mathf.Max(1f, pixelsPerHP);
+        float screenWidth = root.contentRect.width;
+        if (screenWidth > 0f && !float.IsNaN(screenWidth))
+            displayedBarWidth = Mathf.Min(displayedBarWidth, Mathf.Max(1f, screenWidth - 32f));
         healthBarBG.style.width = displayedBarWidth;
 
-        // 红色实际生命值
-        healthFill.style.width = Mathf.Clamp(
-            displayedRedWidth,
-            0f,
-            displayedBarWidth
-        );
+        // 只需要显示最上面的两个颜色层，不随总血量创建更多 UI 元素。
+        int layer = displayedHealth > 0f
+            ? Mathf.Max(0, Mathf.CeilToInt(displayedHealth / HealthPerLayer) - 1)
+            : 0;
+        float layerHealth = Mathf.Max(0f, displayedHealth - layer * HealthPerLayer);
+        layerBaseFill.style.backgroundColor = GetLayerColor(Mathf.Max(0, layer - 1));
+        SetFillRange(layerBaseFill, 0f, layer > 0 ? capacity : 0f, capacity);
+        healthFill.style.backgroundColor = GetLayerColor(layer);
+        SetFillRange(healthFill, 0f, layerHealth, capacity);
 
+        RenderGreenGrowth(capacity);
         CenterBar();
     }
 
-    private void OnRootGeometryChanged(
-        GeometryChangedEvent evt)
+    private Color GetLayerColor(int layer)
     {
-        CenterBar();
+        float brightness = 1f / (1f + Mathf.Max(0.01f, layerDarkening) * Mathf.Max(0, layer));
+        return new Color(
+            firstLayerColor.r * brightness,
+            firstLayerColor.g * brightness,
+            firstLayerColor.b * brightness,
+            firstLayerColor.a);
+    }
+
+    private void RenderGreenGrowth(float capacity)
+    {
+        SetFillRange(growthFill, 0f, 0f, capacity);
+        SetFillRange(growthWrapFill, 0f, 0f, capacity);
+        float amount = Mathf.Max(0f, growthHealth - displayedHealth);
+        if (amount <= 0f)
+            return;
+
+        if (amount >= HealthPerLayer)
+        {
+            // 尚未覆盖的回血跨越完整一层时，绿色暂时覆盖整条血条。
+            SetFillRange(growthFill, 0f, capacity, capacity);
+            return;
+        }
+
+        float start = Mathf.Repeat(displayedHealth, HealthPerLayer);
+        float firstAmount = Mathf.Min(amount, HealthPerLayer - start);
+        SetFillRange(growthFill, start, firstAmount, capacity);
+        // 例如95 -> 105，绿色同时出现在旧层末尾和新层开头。
+        SetFillRange(growthWrapFill, 0f, amount - firstAmount, capacity);
+    }
+
+    private static void SetFillRange(VisualElement fill, float start, float amount, float capacity)
+    {
+        start = Mathf.Clamp(start, 0f, capacity);
+        amount = Mathf.Clamp(amount, 0f, capacity - start);
+        fill.style.left = Length.Percent(start / capacity * 100f);
+        fill.style.width = Length.Percent(amount / capacity * 100f);
+    }
+
+    private void OnRootGeometryChanged(GeometryChangedEvent evt)
+    {
+        ApplyVisuals();
     }
 
     private void CenterBar()
     {
-        if (root == null || healthBarBG == null)
+        if (root == null || healthBarBG == null || healthText == null)
             return;
 
         float screenWidth = root.contentRect.width;
-
         if (screenWidth <= 0f || float.IsNaN(screenWidth))
             return;
-
-        // 始终以屏幕中心为基准，向两侧增长
-        healthBarBG.style.left =
-            (screenWidth - displayedBarWidth) * 0.5f;
-
-        // 生命值数字始终位于屏幕下方中央
-        healthText.style.left =
-            (screenWidth - 240f) * 0.5f;
+        healthBarBG.style.left = (screenWidth - displayedBarWidth) * 0.5f;
+        healthText.style.left = (screenWidth - 240f) * 0.5f;
     }
 }

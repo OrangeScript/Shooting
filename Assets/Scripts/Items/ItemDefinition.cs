@@ -32,4 +32,17 @@ public class ItemDefinition : ScriptableObject
     [Header("Appearance")]
     public EquipmentSlot slot = EquipmentSlot.None;
     public GameObject equipPrefab;
+
+    [Header("World Appearance")]
+    public GameObject pickupVisualPrefab;
+
+    [Header("Shared Item Effects")]
+    public List<ItemEffectDefinition> sharedEffects = new();
+
+    [Header("Game_01 Shooter Effects")]
+    public List<ItemEffectDefinition> shooterEffects = new();
+
+    [Header("Scene_02 Arena Effects")]
+    public List<ItemEffectDefinition> arenaEffects = new();
+
 }

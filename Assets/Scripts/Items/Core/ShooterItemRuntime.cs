@@ -62,8 +62,6 @@ public class ShooterItemRuntime : MonoBehaviour
 
         foreach (int id in removedIds)
         {
-            foreach (var runtime in activeEffects[id])
-                runtime.Dispose();
             ReleaseEffects(activeEffects[id]);
             activeEffects.Remove(id);
         }

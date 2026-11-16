@@ -22,11 +22,13 @@ public class AutoShooter : MonoBehaviour
     private int baseDamage = 1;
 
     private ShooterCombatStats combatStats;
+    private ShooterCombatPipeline combatPipeline;
 
     private void Awake()
     {
         shooterHealth = GetComponent<ShooterPlayerHealth>();
         combatStats = GetComponent<ShooterCombatStats>();
+        combatPipeline = GetComponent<ShooterCombatPipeline>();
     }
 
     private void Update()
@@ -56,10 +58,18 @@ public class AutoShooter : MonoBehaviour
                 : baseDamage
         };
 
+        IProjectileHitAction[] actions =
+            combatPipeline != null
+                ? combatPipeline.Capture(attack.Source)
+                : System.Array.Empty<IProjectileHitAction>();
+        
+
+
         bulletPool.Spawn(
             firePoint.position,
             firePoint.rotation,
-            attack
+            attack,
+            actions
         );
         if (muzzleFlash != null)
         {

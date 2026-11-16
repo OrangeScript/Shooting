@@ -19,15 +19,20 @@ public class Bullet : MonoBehaviour
     private bool inFlight;
     private static int lastPhysicsSyncFrame = -1;
     private ShooterAttackContext attacker;
+    private IProjectileHitAction[] hitActions =
+    System.Array.Empty<IProjectileHitAction>();
 
     // 每次发射都要重新初始化
     public void Launch(
         BulletPool ownerPool,
         Vector3 position,
-        Quaternion rotation,ShooterAttackContext attack)
+        Quaternion rotation,ShooterAttackContext attack,
+        IProjectileHitAction[] actions)
     {
         pool = ownerPool;
         this.attacker = attack;
+        hitActions = actions ??
+        System.Array.Empty<IProjectileHitAction>();
 
         transform.SetPositionAndRotation(position, rotation);
 
@@ -125,6 +130,7 @@ public class Bullet : MonoBehaviour
             return;
 
         inFlight = false;
+        hitActions = System.Array.Empty<IProjectileHitAction>();
         pool.Release(this);
     }
 
@@ -138,10 +144,17 @@ public class Bullet : MonoBehaviour
             attacker.Damage,
             attacker.Owner
         );
+        foreach (IProjectileHitAction action in hitActions)
+        {
+            action?.OnHit(
+                attacker,
+                enemy,
+                enemyMask
+            );
+        }
 
-        Debug.Log(
-            $"[{attacker.Source}] 击中 {enemy.name}，" +
-            $"造成 {attacker.Damage} 伤害"
+            Debug.Log(
+            $"本次子弹命中，携带 {hitActions.Length} 个特殊效果"
         );
     }
 

@@ -9,7 +9,9 @@ public enum ShooterAttackSource
     MeleeSweep,
     LightningBounce,
     DeathExplosion = 4,
-    Unknown
+    Unknown,
+    HitExplosion,
+    SwordPet
 }
 
 public struct ShooterAttackContext

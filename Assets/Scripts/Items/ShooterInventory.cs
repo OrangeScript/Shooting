@@ -49,4 +49,9 @@ public class ShooterInventory : MonoBehaviour
     {
         Debug.Log($"添加爆裂核心：{TryAdd(2007)}");
     }
+    [ContextMenu("Test / Add Hit Explosion")]
+    private void TestAddHitExplosion()
+    {
+        Debug.Log($"添加命中爆炸：{TryAdd(2008)}");
+    }
 }

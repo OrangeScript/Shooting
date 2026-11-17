@@ -1,77 +1,98 @@
 
-// using System.Collections.Generic;
-// using UnityEngine;
+using System.Collections.Generic;
+using UnityEngine;
 
-// public static class ChainLightningResolver
-// {
-//     public static void Bounce(
-//         Enemy firstTarget,
-//         ShooterAttackContext attack,
-//         LayerMask enemyMask)
-//     {
-//         if (firstTarget == null || attack.MaxBounces <= 0)
-//             return;
+public static class ChainLightningResolver
+{
+    public static void Bounce(
+        Enemy firstTarget,
+        ShooterAttackContext attack,
+        LayerMask enemyMask,
+        float chance,
+        int maxBounces,
+        float radius,
+        float damageRetention)
+    {
+        if (firstTarget == null || maxBounces <= 0)
+            return;
 
-//         if (Random.value > attack.LightningChance)
-//             return;
+        // 检查本次是否触发闪电
+        if (Random.value >= Mathf.Clamp01(chance))
+            return;
 
-//         HashSet<Enemy> visited = new()
-//         {
-//             firstTarget
-//         };
+        // 防止一条闪电重复命中同一个敌人
+        HashSet<Enemy> visited = new()
+        {
+            firstTarget
+        };
 
-//         Enemy current = firstTarget;
+        Vector3 from = firstTarget.transform.position;
 
-//         for (int i = 0; i < attack.MaxBounces; i++)
-//         {
-//             Collider[] candidates = Physics.OverlapSphere(
-//                 current.transform.position,
-//                 attack.BounceRadius,
-//                 enemyMask,
-//                 QueryTriggerInteraction.Collide
-//             );
+        for (int i = 1; i <= maxBounces; i++)
+        {
+            Collider[] hits = Physics.OverlapSphere(
+                from,
+                radius,
+                enemyMask,
+                QueryTriggerInteraction.Collide
+            );
 
-//             Enemy next = null;
-//             float bestDistance = float.MaxValue;
+            Enemy nearest = null;
+            float bestDistance = float.PositiveInfinity;
 
-//             foreach (Collider collider in candidates)
-//             {
-//                 Enemy enemy =
-//                     collider.GetComponentInParent<Enemy>();
+            foreach (Collider hit in hits)
+            {
+                Enemy candidate =
+                    hit.GetComponentInParent<Enemy>();
 
-//                 if (enemy == null ||
-//                     !enemy.IsAlive ||
-//                     visited.Contains(enemy))
-//                     continue;
+                if (candidate == null ||
+                    !candidate.IsAlive ||
+                    visited.Contains(candidate))
+                    continue;
 
-//                 float distance =
-//                     (enemy.transform.position -
-//                      current.transform.position).sqrMagnitude;
+                float distance =
+                    (candidate.transform.position - from)
+                    .sqrMagnitude;
 
-//                 if (distance < bestDistance)
-//                 {
-//                     bestDistance = distance;
-//                     next = enemy;
-//                 }
-//             }
+                if (distance < bestDistance)
+                {
+                    bestDistance = distance;
+                    nearest = candidate;
+                }
+            }
 
-//             if (next == null)
-//                 break;
+            if (nearest == null)
+                break;
 
-//             visited.Add(next);
+            // 保存位置，避免怪物死亡后产生引用问题
+            Vector3 to = nearest.transform.position;
+            visited.Add(nearest);
+            LightningArcVFX.Instance?.Play(from, to);
 
-//             // 每次弹射衰减 30% 伤害
-//             int damage = Mathf.Max(
-//                 1,
-//                 Mathf.RoundToInt(
-//                     attack.Damage * Mathf.Pow(0.7f, i + 1)
-//                 )
-//             );
+            int damage = Mathf.Max(
+                1,
+                Mathf.RoundToInt(
+                    attack.Damage *
+                    Mathf.Pow(damageRetention, i)
+                )
+            );
 
-//             next.TakeDamage(damage, attack.Owner);
+            // 可在 Scene 视图中看到蓝色连线
+            Debug.DrawLine(
+                from + Vector3.up,
+                to + Vector3.up,
+                Color.cyan,
+                0.4f
+            );
 
-//             // 后续可以在这里播放两只怪之间的闪电特效
-//             current = next;
-//         }
-//     }
-// }
+            nearest.TakeDamage(damage, attack.Owner);
+
+            Debug.Log(
+                $"[Lightning] 弹射第 {i} 次，" +
+                $"目标 {nearest.name}，伤害 {damage}"
+            );
+
+            from = to;
+        }
+    }
+}

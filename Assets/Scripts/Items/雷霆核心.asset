@@ -14,9 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 2006
   itemName: "\u96F7\u9706\u6838\u5FC3"
-  maxStacks: 6
+  maxStacks: 1
   bonusDamage: 0
   speedMultiplier: 1
   sizeMultiplier: 1
   slot: 0
   equipPrefab: {fileID: 0}
+  pickupVisualPrefab: {fileID: 0}
+  sharedEffects:
+  - {fileID: 11400000, guid: 1cff25e43ac135047baab9342ac705ec, type: 2}
+  shooterEffects: []
+  arenaEffects: []

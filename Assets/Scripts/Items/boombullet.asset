@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b04e18f8f0ca0634ea44520e309b29eb, type: 3}
   m_Name: boombullet
   m_EditorClassIdentifier: 
-  id: 0
-  itemName: 
+  id: 2008
+  itemName: "\u7206\u70B8"
   maxStacks: 1
   bonusDamage: 0
   speedMultiplier: 1
@@ -22,5 +22,6 @@ MonoBehaviour:
   equipPrefab: {fileID: 0}
   pickupVisualPrefab: {fileID: 0}
   sharedEffects: []
-  shooterEffects: []
+  shooterEffects:
+  - {fileID: 11400000, guid: 501ca7f14c3064a4da446150a19118f8, type: 2}
   arenaEffects: []

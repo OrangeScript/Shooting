@@ -31,6 +31,12 @@ public class ShooterInventory : MonoBehaviour
     {
         Debug.Log($"添加 Drone: {TryAdd(2001)}");
     }
+    [ContextMenu("Test / Add sworde")]
+    private void TestAddSword()
+    {
+        Debug.Log($"添加 Drone: {TryAdd(2002)}");
+    }
+
 
     [ContextMenu("Test / Add Lightning")]
     private void TestAddLightning()

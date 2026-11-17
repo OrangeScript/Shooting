@@ -22,6 +22,9 @@ public struct ShooterAttackContext
     // 本次攻击最终伤害
     public int Damage;
 
+    // 发射时的速度快照；未设置（0）的旧攻击按基础速度处理。
+    public float ProjectileSpeedMultiplier;
+
     // 攻击来源
     public ShooterAttackSource Source;
 }

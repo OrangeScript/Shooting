@@ -14,6 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 2008
   itemName: "\u7206\u70B8"
+  description: "命中引发2.5米爆炸，基础爆炸伤害为子弹伤害的100%；每额外一层增加25个百分点，无人机继承50%倍率。"
+  kind: 0
+  availability: 2
+  dropWeight: 1
   maxStacks: 1
   bonusDamage: 0
   speedMultiplier: 1

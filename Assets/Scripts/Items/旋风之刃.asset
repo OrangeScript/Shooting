@@ -14,6 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 2002
   itemName: "\u65CB\u98CE\u4E4B\u5203"
+  description: "每层召唤1把自动追敌近战悬浮剑，继承部分攻击力；所有宠物合计最多12只。"
+  kind: 0
+  availability: 2
+  dropWeight: 1
   maxStacks: 1
   bonusDamage: 0
   speedMultiplier: 1

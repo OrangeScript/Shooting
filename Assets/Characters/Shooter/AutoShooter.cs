@@ -24,6 +24,11 @@ public class AutoShooter : MonoBehaviour
     private ShooterCombatStats combatStats;
     private ShooterCombatPipeline combatPipeline;
 
+    public int BaseDamage => baseDamage;
+    public float BaseFireInterval => fireInterval;
+    public float EffectiveFireInterval => Mathf.Max(0.01f, fireInterval) /
+        (combatStats != null ? combatStats.AttackSpeedMultiplier : 1f);
+
     private void Awake()
     {
         shooterHealth = GetComponent<ShooterPlayerHealth>();
@@ -38,7 +43,7 @@ public class AutoShooter : MonoBehaviour
         if (Time.time < nextFireTime)
             return;
 
-        nextFireTime = Time.time + Mathf.Max(0.01f, fireInterval);
+        nextFireTime = Time.time + EffectiveFireInterval;
 
         Fire();
     }
@@ -52,6 +57,8 @@ public class AutoShooter : MonoBehaviour
         {
             Owner = shooterHealth,
             Source = ShooterAttackSource.PlayerBullet,
+            ProjectileSpeedMultiplier = combatStats != null
+                ? combatStats.ProjectileSpeedMultiplier : 1f,
 
             Damage = combatStats != null
                 ? combatStats.CalculateDamage(baseDamage)

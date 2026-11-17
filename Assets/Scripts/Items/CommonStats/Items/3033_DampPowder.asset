@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b04e18f8f0ca0634ea44520e309b29eb, type: 3}
+  m_Name: "受潮火药"
+  m_EditorClassIdentifier:
+  id: 3033
+  itemName: "受潮火药"
+  description: "子弹速度 -20%。"
+  kind: 2
+  availability: 2
+  dropWeight: 1
+  maxStacks: 3
+  bonusDamage: 0
+  speedMultiplier: 1
+  sizeMultiplier: 1
+  slot: 0
+  equipPrefab: {fileID: 0}
+  pickupVisualPrefab: {fileID: 0}
+  sharedEffects: []
+  shooterEffects:
+  - {fileID: 11400000, guid: f543aba50b204ba4929e9c1cdc2c09ef, type: 2}
+  arenaEffects: []

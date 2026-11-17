@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b04e18f8f0ca0634ea44520e309b29eb, type: 3}
+  m_Name: "追风弹簧"
+  m_EditorClassIdentifier:
+  id: 3016
+  itemName: "追风弹簧"
+  description: "攻击速度 +6%；移动速度 +4%。"
+  kind: 0
+  availability: 2
+  dropWeight: 8
+  maxStacks: 4
+  bonusDamage: 0
+  speedMultiplier: 1
+  sizeMultiplier: 1
+  slot: 0
+  equipPrefab: {fileID: 0}
+  pickupVisualPrefab: {fileID: 0}
+  sharedEffects: []
+  shooterEffects:
+  - {fileID: 11400000, guid: 402af13e1df54e6eb31f8e696bd52073, type: 2}
+  arenaEffects: []

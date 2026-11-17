@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b04e18f8f0ca0634ea44520e309b29eb, type: 3}
+  m_Name: "静养护符"
+  m_EditorClassIdentifier:
+  id: 3028
+  itemName: "静养护符"
+  description: "生命恢复 +0.55/秒；移动速度 -15%。"
+  kind: 1
+  availability: 2
+  dropWeight: 4
+  maxStacks: 3
+  bonusDamage: 0
+  speedMultiplier: 1
+  sizeMultiplier: 1
+  slot: 0
+  equipPrefab: {fileID: 0}
+  pickupVisualPrefab: {fileID: 0}
+  sharedEffects: []
+  shooterEffects:
+  - {fileID: 11400000, guid: f21ab7e587104549af96c4e9f2f33745, type: 2}
+  arenaEffects: []

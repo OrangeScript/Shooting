@@ -14,12 +14,18 @@ public class GamerController : MonoBehaviour
     private float horizontalInput;
     private float verticalVelocity;
     private ShooterPlayerHealth health;
+    private ShooterCombatStats combatStats;
+
+    public float BaseMoveSpeed => moveSpeed;
+    public float EffectiveMoveSpeed => moveSpeed *
+        (combatStats != null ? combatStats.MoveSpeedMultiplier : 1f);
 
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
         playerInput = GetComponent<PlayerInput>();
         health = GetComponent<ShooterPlayerHealth>();
+        combatStats = GetComponent<ShooterCombatStats>();
     }
 
 
@@ -41,7 +47,7 @@ public class GamerController : MonoBehaviour
         return;
         // 仅允许 X 轴移动
         Vector3 velocity = new Vector3(
-            horizontalInput * moveSpeed,
+            horizontalInput * EffectiveMoveSpeed,
             0,
             0f
         );

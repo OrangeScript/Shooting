@@ -9,6 +9,7 @@ public class Bullet : MonoBehaviour
 
     private BulletPool pool;
     private float remainingLifetime;
+    private float flightSpeed;
 
 
     [Header("命中检测")]
@@ -31,6 +32,8 @@ public class Bullet : MonoBehaviour
     {
         pool = ownerPool;
         this.attacker = attack;
+        flightSpeed = speed * (attack.ProjectileSpeedMultiplier > 0f
+            ? attack.ProjectileSpeedMultiplier : 1f);
         hitActions = actions ??
         System.Array.Empty<IProjectileHitAction>();
 
@@ -63,7 +66,7 @@ public class Bullet : MonoBehaviour
         if (TryHitAtOrigin())
             return;
 
-        float distance = speed * Time.deltaTime;
+        float distance = flightSpeed * Time.deltaTime;
         Vector3 direction = transform.forward;
 
         // 只检测 Enemy Layer，包含 Trigger Collider

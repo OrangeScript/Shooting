@@ -71,7 +71,7 @@ public class ItemSpawner : NetworkBehaviour
 
         foreach (ItemDefinition item in database.GetAllItems())
         {
-            if (item == null)
+            if (item == null || !item.IsAvailableIn(ItemAvailability.Arena))
                 continue;
 
             // 避免重复 ID

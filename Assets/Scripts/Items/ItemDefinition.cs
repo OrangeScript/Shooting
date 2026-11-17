@@ -9,6 +9,11 @@ public enum EquipmentSlot
     Back
 }
 
+public enum ItemKind { Standard, Tradeoff, Curse }
+
+[System.Flags]
+public enum ItemAvailability { Arena = 1, Shooter = 2, Both = Arena | Shooter }
+
 [CreateAssetMenu(
     fileName = "NewItem",
     menuName = "Item Definition"
@@ -20,6 +25,11 @@ public class ItemDefinition : ScriptableObject
     [Header("Identity")]
     public int id;
     public string itemName;
+
+    [TextArea(2, 5)] public string description;
+    public ItemKind kind;
+    public ItemAvailability availability = ItemAvailability.Both;
+    [Min(0f)] public float dropWeight = 8f;
 
     [Min(1)]
     public int maxStacks = 1;
@@ -44,5 +54,7 @@ public class ItemDefinition : ScriptableObject
 
     [Header("Scene_02 Arena Effects")]
     public List<ItemEffectDefinition> arenaEffects = new();
+
+    public bool IsAvailableIn(ItemAvailability mode) => (availability & mode) != 0;
 
 }

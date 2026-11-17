@@ -14,6 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 2006
   itemName: "\u96F7\u9706\u6838\u5FC3"
+  description: "主角子弹命中触发连锁闪电，首层最多弹跳3次，范围5米；每额外一层增加1次弹跳。无人机以35%概率倍率继承。"
+  kind: 0
+  availability: 2
+  dropWeight: 1
   maxStacks: 1
   bonusDamage: 0
   speedMultiplier: 1

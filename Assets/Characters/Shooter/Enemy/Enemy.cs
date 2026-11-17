@@ -77,27 +77,42 @@ public class Enemy : MonoBehaviour
    
     public void TakeDamage(int damage,ShooterPlayerHealth attacker = null)
     {
-        if (!IsAlive || damage <= 0)
+
+            TakeDamage(new ShooterAttackContext
+        {
+            Owner = attacker,
+            Damage = damage,
+            Source = ShooterAttackSource.Unknown
+        });
+    }
+
+        public void TakeDamage(ShooterAttackContext attack)
+    {
+        if (!IsAlive || attack.Damage <= 0)
             return;
 
         currentHealth = Mathf.Max(
-            0, currentHealth - damage
+            0,
+            currentHealth - attack.Damage
         );
 
         Debug.Log($"{name} HP: {currentHealth}");
 
         if (currentHealth == 0)
-            Die(attacker);
+            Die(attack);
     }
     
 
-    private void Die(ShooterPlayerHealth killer)
+    private void Die(ShooterAttackContext attack)
     {
         if(!IsAlive) return;
         IsAlive = false;
-
-        if (killer != null)
-        killer.GainMaxHealth(Mathf.Max(1, maxHealth));
+        var kill = new EnemyKillContext(
+            transform.position,
+            MaxHealth,
+            attack
+        );
+        
 
         foreach (Collider hitbox in hitboxes)
         {
@@ -108,6 +123,13 @@ public class Enemy : MonoBehaviour
         enemyAnimation?.PlayDie();
         EnemyHealthUI.Instance?.Unregister(this);
         StartCoroutine(DeathAndRecycle());
+
+        ShooterPlayerHealth killer = attack.Owner;
+        if (killer != null){
+        killer.GainMaxHealth(Mathf.Max(1, maxHealth));
+        killer.GetComponent<ShooterCombatPipeline>()
+            ?.ReportEnemyKilled(kill);
+        }
     }
 
     private IEnumerator DeathAndRecycle()

@@ -9,6 +9,12 @@ public class ShooterCombatPipeline : MonoBehaviour
     private readonly List<IProjectileHitEffect> hitEffects = new();
 
     public int RegisteredEffectCount => hitEffects.Count;
+    public event Action<EnemyKillContext> EnemyKilled;
+
+    public void ReportEnemyKilled(EnemyKillContext context)
+    {
+        EnemyKilled?.Invoke(context);
+    }
 
     // 道具生效时注册
     public void Register(IProjectileHitEffect effect)

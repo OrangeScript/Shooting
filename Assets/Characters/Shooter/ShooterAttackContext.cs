@@ -1,10 +1,15 @@
 
+
+using UnityEngine;
+
 public enum ShooterAttackSource
 {
     PlayerBullet,
     DroneBullet,
     MeleeSweep,
-    LightningBounce
+    LightningBounce,
+    DeathExplosion = 4,
+    Unknown
 }
 
 public struct ShooterAttackContext
@@ -17,4 +22,21 @@ public struct ShooterAttackContext
 
     // 攻击来源
     public ShooterAttackSource Source;
+}
+
+public readonly struct EnemyKillContext
+{
+    public readonly Vector3 Position;
+    public readonly int VictimMaxHealth;
+    public readonly ShooterAttackContext Attack;
+
+    public EnemyKillContext(
+        Vector3 position,
+        int victimMaxHealth,
+        ShooterAttackContext attack)
+    {
+        Position = position;
+        VictimMaxHealth = Mathf.Max(1, victimMaxHealth);
+        Attack = attack;
+    }
 }

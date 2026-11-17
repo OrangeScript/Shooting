@@ -43,4 +43,10 @@ public class ShooterInventory : MonoBehaviour
     {
         Debug.Log($"添加 Bullet: {TryAdd(2005)}");
     }
+
+    [ContextMenu("Test / Add Kill Explosion")]
+    private void TestAddKillExplosion()
+    {
+        Debug.Log($"添加爆裂核心：{TryAdd(2007)}");
+    }
 }

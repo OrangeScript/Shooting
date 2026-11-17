@@ -141,8 +141,7 @@ public class Bullet : MonoBehaviour
             return;
 
         enemy.TakeDamage(
-            attacker.Damage,
-            attacker.Owner
+            attacker
         );
         foreach (IProjectileHitAction action in hitActions)
         {

@@ -84,8 +84,11 @@ public static class ChainLightningResolver
                 Color.cyan,
                 0.4f
             );
+            var bounceAttack = attack;
+            bounceAttack.Damage = damage;
+            bounceAttack.Source = ShooterAttackSource.LightningBounce;
 
-            nearest.TakeDamage(damage, attack.Owner);
+            nearest.TakeDamage(bounceAttack);
 
             Debug.Log(
                 $"[Lightning] 弹射第 {i} 次，" +

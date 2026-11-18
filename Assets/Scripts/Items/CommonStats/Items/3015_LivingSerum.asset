@@ -16,6 +16,7 @@ MonoBehaviour:
   itemName: "活性药剂"
   description: "生命恢复 +0.30/秒；不足1点的恢复会累积。"
   kind: 0
+  rarity: 1
   availability: 2
   dropWeight: 6
   maxStacks: 3

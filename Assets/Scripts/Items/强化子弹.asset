@@ -16,6 +16,7 @@ MonoBehaviour:
   itemName: "\u5F3A\u5316\u5B50\u5F39"
   description: "每层攻击力 +5，宠物按各自伤害继承比例生效。"
   kind: 0
+  rarity: 2
   availability: 2
   dropWeight: 1
   maxStacks: 1

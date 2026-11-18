@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b04e18f8f0ca0634ea44520e309b29eb, type: 3}
+  m_Name: "凝血霜痕"
+  m_EditorClassIdentifier:
+  id: 3113
+  itemName: "凝血霜痕"
+  description: "弹速 -40%，闪避率 -10 个百分点，每秒回血 -1 点。"
+  kind: 2
+  rarity: 4
+  availability: 2
+  dropWeight: 9
+  maxStacks: 1
+  bonusDamage: 0
+  speedMultiplier: 1
+  sizeMultiplier: 1
+  slot: 0
+  equipPrefab: {fileID: 0}
+  pickupVisualPrefab: {fileID: 5380225925143708413, guid: a51b1909ba7af8d4e8acaa110ef6b4b4, type: 3}
+  sharedEffects: []
+  shooterEffects:
+  - {fileID: 11400000, guid: 5505110b5cd94dbfa3f5d6cb54c3936b, type: 2}
+  arenaEffects: []

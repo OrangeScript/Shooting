@@ -16,6 +16,7 @@ MonoBehaviour:
   itemName: "影步披风"
   description: "闪避几率 +6 个百分点，成功时免除本次伤害。"
   kind: 0
+  rarity: 1
   availability: 2
   dropWeight: 6
   maxStacks: 3

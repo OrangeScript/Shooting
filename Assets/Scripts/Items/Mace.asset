@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 103
   itemName: Mace
+  rarity: 0
+  availability: 1
   maxStacks: 1
   bonusDamage: 0
   speedMultiplier: 3

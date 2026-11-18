@@ -115,7 +115,7 @@ public class EnemyLaserBeam : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (!Ready)
+        if (!enemy.IsAlive || !Ready)
         {
             StopBeam();
             return;

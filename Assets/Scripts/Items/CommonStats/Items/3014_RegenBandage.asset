@@ -16,6 +16,7 @@ MonoBehaviour:
   itemName: "再生绷带"
   description: "生命恢复 +0.15/秒；不足1点的恢复会累积。"
   kind: 0
+  rarity: 0
   availability: 2
   dropWeight: 8
   maxStacks: 5

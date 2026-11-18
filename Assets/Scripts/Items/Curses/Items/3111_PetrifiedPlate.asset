@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b04e18f8f0ca0634ea44520e309b29eb, type: 3}
+  m_Name: "石化骨板"
+  m_EditorClassIdentifier:
+  id: 3111
+  itemName: "石化骨板"
+  description: "生命上限 -4，移速 -55%。"
+  kind: 2
+  rarity: 4
+  availability: 2
+  dropWeight: 8
+  maxStacks: 1
+  bonusDamage: 0
+  speedMultiplier: 1
+  sizeMultiplier: 1
+  slot: 0
+  equipPrefab: {fileID: 0}
+  pickupVisualPrefab: {fileID: 13511574665120986, guid: 6379e89667f12694c8c72a119efa3a90, type: 3}
+  sharedEffects: []
+  shooterEffects:
+  - {fileID: 11400000, guid: 4e8e374364ff46bab9335373000b1240, type: 2}
+  arenaEffects: []

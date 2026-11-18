@@ -16,6 +16,7 @@ MonoBehaviour:
   itemName: "滚轮护腿"
   description: "角色移动速度 +15%。"
   kind: 0
+  rarity: 1
   availability: 2
   dropWeight: 6
   maxStacks: 3

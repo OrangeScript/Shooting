@@ -36,4 +36,26 @@
 
     </ui:VisualElement>
 
+    <ui:VisualElement name="RunHud" class="run-hud run-text" picking-mode="Ignore">
+        <ui:Label name="RunStatus" text="准备开始" class="run-status" picking-mode="Ignore" />
+        <ui:VisualElement name="RunBoss" class="run-boss run-hidden" picking-mode="Ignore">
+            <ui:VisualElement class="run-boss-heading" picking-mode="Ignore">
+                <ui:Label text="首领生命" class="run-boss-label" picking-mode="Ignore" />
+                <ui:Label name="RunBossHealth" class="run-boss-value" picking-mode="Ignore" />
+            </ui:VisualElement>
+            <ui:VisualElement class="run-boss-track" picking-mode="Ignore">
+                <ui:VisualElement name="RunBossHealthFill" class="run-boss-fill" picking-mode="Ignore" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+
+    <ui:VisualElement name="RunResult" class="run-result run-text run-hidden" picking-mode="Position">
+        <ui:VisualElement name="RunResultCard" class="run-result-card">
+            <ui:Label name="RunResultTitle" text="本局结束" class="run-result-title" />
+            <ui:Label name="RunResultDetails" class="run-result-details" />
+            <ui:Button name="RunRestartKeepingItems" text="保留道具重开" class="run-result-button run-result-button-primary" />
+            <ui:Button name="RunRestartFresh" text="从零重开" class="run-result-button" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+
 </ui:UXML>

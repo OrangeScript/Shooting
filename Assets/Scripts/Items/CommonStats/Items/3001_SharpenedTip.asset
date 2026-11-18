@@ -16,6 +16,7 @@ MonoBehaviour:
   itemName: "磨锐弹头"
   description: "攻击力 +1。"
   kind: 0
+  rarity: 0
   availability: 2
   dropWeight: 4
   maxStacks: 3

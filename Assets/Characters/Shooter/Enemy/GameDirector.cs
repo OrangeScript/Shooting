@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -10,7 +9,17 @@ public class GameDirector : MonoBehaviour
     private class BossWave
     {
         public int wave;
+        public string title;
         public EnemyPool pool;
+        [Min(1)] public int health = 30;
+    }
+
+    [System.Serializable]
+    private class EnemySpawn
+    {
+        public EnemySpawner spawner;
+        [Range(1, 20)] public int firstWave = 1;
+        [Min(1)] public int weight = 1;
     }
 
     private enum State { Playing, Dying, Defeat, Victory }
@@ -18,14 +27,13 @@ public class GameDirector : MonoBehaviour
     [Header("本局")]
     [SerializeField] private ShooterPlayerHealth player;
     [SerializeField] private ShooterInventory inventory;
-    [SerializeField] private EnemySpawner normalSpawner;
+    [SerializeField] private EnemySpawn[] enemySpawns;
     [SerializeField, Range(1, 20)] private int waveCount = 20;
     [SerializeField, Min(1f)] private float firstWaveSeconds = 20f;
     [SerializeField, Min(1f)] private float lastWaveSeconds = 60f;
 
     [Header("奖励门")]
     [SerializeField] private Enemy doorPrefab;
-    [SerializeField] private ItemDefinition[] gateRewards;
 
     [Header("危险与 Boss")]
     [SerializeField] private RoadHazard spikePrefab;
@@ -34,9 +42,7 @@ public class GameDirector : MonoBehaviour
     [SerializeField] private BossWave[] bosses;
 
     [Header("界面")]
-    [SerializeField] private TMP_Text statusText;
-    [SerializeField] private GameObject defeatPanel;
-    [SerializeField] private GameObject victoryPanel;
+    [SerializeField] private ShooterRunHUD hud;
 
     private State state;
     private bool restarting;
@@ -53,16 +59,16 @@ public class GameDirector : MonoBehaviour
 
     private IEnumerator Start()
     {
-        if (player == null || inventory == null || normalSpawner == null ||
+        if (player == null || inventory == null || inventory.Database == null ||
+            enemySpawns == null || enemySpawns.Length == 0 ||
             doorPrefab == null || doorPrefab.GetComponent<EnemyRewardDrop>() == null)
         {
-            Debug.LogError("请配置玩家、背包、普通刷怪器和带掉落组件的 Door。", this);
+            Debug.LogError("请配置玩家、道具数据库、怪物生成和带掉落组件的 Door。", this);
             yield break;
         }
 
         Time.timeScale = 1f;
-        defeatPanel?.SetActive(false);
-        victoryPanel?.SetActive(false);
+        hud?.ResetRun();
 
         List<int> carried = pendingItems;
         pendingItems = null;
@@ -77,10 +83,10 @@ public class GameDirector : MonoBehaviour
             yield return PlayCombat(wave);
             ClearThreats();
 
-            EnemyPool bossPool = FindBossPool(wave);
-            if (bossPool != null)
+            BossWave boss = FindBoss(wave);
+            if (boss != null)
             {
-                yield return FightBoss(wave, bossPool);
+                yield return FightBoss(wave, boss);
 
                 if (state != State.Playing)
                     yield break;
@@ -115,7 +121,7 @@ public class GameDirector : MonoBehaviour
 
             if (now >= nextEnemy)
             {
-                normalSpawner.SpawnBatch();
+                SpawnEnemies(wave);
                 nextEnemy = now + spawnInterval;
             }
 
@@ -127,6 +133,39 @@ public class GameDirector : MonoBehaviour
 
             yield return null;
         }
+    }
+
+    private void SpawnEnemies(int wave)
+    {
+        int totalWeight = 0;
+        foreach (EnemySpawn entry in enemySpawns)
+        {
+            if (CanSpawn(entry, wave))
+                totalWeight += entry.weight;
+        }
+
+        if (totalWeight == 0)
+            return;
+
+        int roll = Random.Range(0, totalWeight);
+        foreach (EnemySpawn entry in enemySpawns)
+        {
+            if (!CanSpawn(entry, wave))
+                continue;
+
+            roll -= entry.weight;
+            if (roll < 0)
+            {
+                entry.spawner.SpawnBatch();
+                return;
+            }
+        }
+    }
+
+    private static bool CanSpawn(EnemySpawn entry, int wave)
+    {
+        return entry != null && entry.spawner != null && wave >= entry.firstWave &&
+               entry.weight > 0 && entry.spawner.CanSpawn;
     }
 
     private void SpawnHazard(int wave)
@@ -147,7 +186,7 @@ public class GameDirector : MonoBehaviour
         Instantiate(prefab, new Vector3(x, 0f, 12f), Quaternion.identity);
     }
 
-    private EnemyPool FindBossPool(int wave)
+    private BossWave FindBoss(int wave)
     {
         if (bosses == null)
             return null;
@@ -155,31 +194,34 @@ public class GameDirector : MonoBehaviour
         foreach (BossWave entry in bosses)
         {
             if (entry != null && entry.wave == wave)
-                return entry.pool;
+                return entry;
         }
 
         return null;
     }
 
-    private IEnumerator FightBoss(int wave, EnemyPool pool)
+    private IEnumerator FightBoss(int wave, BossWave boss)
     {
-        if (bossSpawnPoint == null)
+        if (bossSpawnPoint == null || boss.pool == null)
         {
-            Debug.LogError("请配置 Boss Spawn Point。", this);
+            Debug.LogError($"请配置第 {wave} 波的 Boss 池和出生点。", this);
             ShowResult(false);
             yield break;
         }
 
         bossKilled = false;
-        activeBoss = pool.Spawn(bossSpawnPoint.position, bossSpawnPoint.rotation);
+        activeBoss = boss.pool.Spawn(
+            bossSpawnPoint.position, bossSpawnPoint.rotation, boss.health);
         activeBoss.Killed += OnBossKilled;
-        SetStatus($"第 {wave}/{waveCount} 波  ·  Boss 战");
+        hud?.SetBoss(activeBoss);
+        SetStatus($"第 {wave}/{waveCount} 波  ·  {boss.title}");
 
         yield return new WaitUntil(() => bossKilled ||
             activeBoss == null || !activeBoss.gameObject.activeInHierarchy);
 
         Enemy defeatedBoss = activeBoss;
         UnbindBoss();
+        hud?.SetBoss(null);
 
         if (!bossKilled)
         {
@@ -217,8 +259,9 @@ public class GameDirector : MonoBehaviour
 
         for (int row = 1; row <= rows; row++)
         {
-            List<ItemDefinition> offers = GetAvailableRewards();
-            int count = Mathf.Min(Random.Range(2, 5), offers.Count);
+            List<ItemDefinition> offers =
+                ShooterLootPool.Roll(inventory, wave, Random.Range(2, 5));
+            int count = offers.Count;
             if (count == 0)
                 yield break;
 
@@ -233,15 +276,11 @@ public class GameDirector : MonoBehaviour
                 float x = slots[slotIndex];
                 slots.RemoveAt(slotIndex);
 
-                int offerIndex = Random.Range(0, offers.Count);
-                ItemDefinition item = offers[offerIndex];
-                offers.RemoveAt(offerIndex);
-
                 var position = new Vector3(x, 0f, 12f);
                 Quaternion rotation = doorPrefab.transform.rotation;
                 Enemy door = Instantiate(doorPrefab, position, rotation);
 
-                door.GetComponent<EnemyRewardDrop>().SetReward(item);
+                door.GetComponent<EnemyRewardDrop>().SetReward(offers[i]);
                 door.Spawn(null, position, rotation, doorHealth);
                 doors.Add(door);
             }
@@ -263,28 +302,6 @@ public class GameDirector : MonoBehaviour
 
             yield return WaitForPickups();
         }
-    }
-
-    private List<ItemDefinition> GetAvailableRewards()
-    {
-        var result = new List<ItemDefinition>();
-
-        if (gateRewards == null || inventory.Database == null)
-            return result;
-
-        foreach (ItemDefinition item in gateRewards)
-        {
-            if (item == null || !item.IsAvailableIn(ItemAvailability.Shooter))
-                continue;
-
-            if (inventory.Database.GetItem(item.id) == item &&
-                inventory.Core.CanAdd(item.id) && !result.Contains(item))
-            {
-                result.Add(item);
-            }
-        }
-
-        return result;
     }
 
     private IEnumerator WaitForPickups()
@@ -348,8 +365,8 @@ public class GameDirector : MonoBehaviour
     {
         state = won ? State.Victory : State.Defeat;
         SetStatus(won ? "通关！" : "本局结束");
-        defeatPanel?.SetActive(!won);
-        victoryPanel?.SetActive(won);
+        hud?.SetBoss(null);
+        hud?.ShowResult(won);
         Time.timeScale = 0f;
     }
 
@@ -384,8 +401,7 @@ public class GameDirector : MonoBehaviour
 
     private void SetStatus(string message)
     {
-        if (statusText != null)
-            statusText.text = message;
+        hud?.SetStatus(message);
     }
 
     private void OnDisable()

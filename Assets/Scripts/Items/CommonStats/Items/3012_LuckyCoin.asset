@@ -16,6 +16,7 @@ MonoBehaviour:
   itemName: "幸运硬币"
   description: "闪避几率 +4 个百分点，成功时免除本次伤害。"
   kind: 0
+  rarity: 0
   availability: 2
   dropWeight: 8
   maxStacks: 5

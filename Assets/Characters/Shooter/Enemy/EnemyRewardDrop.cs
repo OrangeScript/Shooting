@@ -8,6 +8,7 @@ public class EnemyRewardDrop : MonoBehaviour
 {
     [SerializeField] private ItemDefinition reward;
     [SerializeField] private ShooterItemPickup pickupPrefab;
+    [SerializeField] private TMP_Text previewLabel;
 
     [SerializeField] private Vector3 spawnOffset =
         new Vector3(0f, 0.6f, 0f);
@@ -20,6 +21,7 @@ public class EnemyRewardDrop : MonoBehaviour
     public void SetReward(ItemDefinition item)
     {
         reward = item;
+        UpdatePreview();
     }
 
     private void Awake()
@@ -38,12 +40,31 @@ public class EnemyRewardDrop : MonoBehaviour
     private void OnDisable()
     {
         enemy.Spawned -= ResetDrop;
-        enemy.Killed -= DropReward;StopAllCoroutines();
+        enemy.Killed -= DropReward;
+        StopAllCoroutines();
     }
 
     private void ResetDrop()
     {
         dropped = false;
+        UpdatePreview();
+    }
+
+    private void UpdatePreview()
+    {
+        if (previewLabel == null)
+            return;
+
+        previewLabel.gameObject.SetActive(reward != null);
+        if (reward == null)
+            return;
+
+        ItemRarity rarity = ShooterLootPool.GetRarity(reward);
+        string rarityName = ShooterLootPool.GetRarityName(rarity);
+        previewLabel.color = ShooterLootPool.GetRarityColor(rarity);
+        previewLabel.text = rarity == ItemRarity.Curse
+            ? $"【{rarityName}】{reward.itemName}\n{reward.description}"
+            : $"【{rarityName}】{reward.itemName}";
     }
 
     private void DropReward(EnemyKillContext context)
@@ -51,6 +72,8 @@ public class EnemyRewardDrop : MonoBehaviour
         if (dropped)
             return;
         dropped = true;
+        if (previewLabel != null)
+            previewLabel.gameObject.SetActive(false);
         beforeDrop?.Invoke();
 
         if (reward == null || pickupPrefab == null)
@@ -65,7 +88,6 @@ public class EnemyRewardDrop : MonoBehaviour
             StartCoroutine(SpawnAfterDelay(position));
         else
             SpawnPickup(position);
-        
     }
 
     private IEnumerator SpawnAfterDelay(Vector3 position)

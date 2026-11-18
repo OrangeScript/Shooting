@@ -16,6 +16,7 @@ MonoBehaviour:
   itemName: "顺风尾翼"
   description: "子弹速度 +30%。"
   kind: 0
+  rarity: 1
   availability: 2
   dropWeight: 6
   maxStacks: 3

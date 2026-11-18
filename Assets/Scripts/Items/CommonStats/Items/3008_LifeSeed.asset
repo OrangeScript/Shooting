@@ -16,6 +16,7 @@ MonoBehaviour:
   itemName: "生命种子"
   description: "最大生命 +5，同时增加等量当前生命。"
   kind: 0
+  rarity: 0
   availability: 2
   dropWeight: 8
   maxStacks: 5

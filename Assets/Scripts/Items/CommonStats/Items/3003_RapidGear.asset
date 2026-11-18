@@ -16,6 +16,7 @@ MonoBehaviour:
   itemName: "连发齿轮"
   description: "攻击速度 +18%。"
   kind: 0
+  rarity: 1
   availability: 2
   dropWeight: 6
   maxStacks: 3

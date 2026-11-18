@@ -16,6 +16,7 @@ MonoBehaviour:
   itemName: "生存工具包"
   description: "最大生命 +3，同时增加等量当前生命；生命恢复 +0.10/秒。"
   kind: 0
+  rarity: 0
   availability: 2
   dropWeight: 8
   maxStacks: 4

@@ -16,6 +16,7 @@ MonoBehaviour:
   itemName: "重甲内衬"
   description: "最大生命 +12，同时增加等量当前生命；移动速度 -18%。"
   kind: 1
+  rarity: 2
   availability: 2
   dropWeight: 4
   maxStacks: 3

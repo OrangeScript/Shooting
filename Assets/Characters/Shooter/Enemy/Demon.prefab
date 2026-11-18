@@ -842,6 +842,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 30
+  grantKillGrowth: 0
   deathDuration: 1.2
   damage: 1
   healthAnchor: {fileID: 4186085202394187660}
@@ -872,7 +873,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcddd1c99ff13134da2a20bb47d82834, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 20
+  damage: 4
   attackRangeX: 1.62
   attackRangeZ: 3.61
   attackCooldown: 1.5

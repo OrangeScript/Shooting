@@ -16,6 +16,7 @@ MonoBehaviour:
   itemName: "轻型扳机"
   description: "攻击速度 +12%。"
   kind: 0
+  rarity: 0
   availability: 2
   dropWeight: 8
   maxStacks: 5

@@ -1391,6 +1391,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 3
+  grantKillGrowth: 0
   deathDuration: 1.2
   damage: 1
   healthAnchor: {fileID: 0}

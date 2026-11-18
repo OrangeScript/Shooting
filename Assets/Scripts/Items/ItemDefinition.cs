@@ -11,6 +11,8 @@ public enum EquipmentSlot
 
 public enum ItemKind { Standard, Tradeoff, Curse }
 
+public enum ItemRarity { Common = 0, Rare = 1, Epic = 2, Legendary = 3, Curse = 4 }
+
 [System.Flags]
 public enum ItemAvailability { Arena = 1, Shooter = 2, Both = Arena | Shooter }
 
@@ -28,7 +30,9 @@ public class ItemDefinition : ScriptableObject
 
     [TextArea(2, 5)] public string description;
     public ItemKind kind;
+    public ItemRarity rarity = ItemRarity.Common;
     public ItemAvailability availability = ItemAvailability.Both;
+    [Tooltip("Game_01 奖励门中，相同品质内的抽取权重。")]
     [Min(0f)] public float dropWeight = 8f;
 
     [Min(1)]

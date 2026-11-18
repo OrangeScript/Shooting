@@ -16,6 +16,7 @@ MonoBehaviour:
   itemName: "惰性护盾"
   description: "闪避几率 +10 个百分点；攻击速度 -18%；子弹速度 -15%。"
   kind: 1
+  rarity: 1
   availability: 2
   dropWeight: 4
   maxStacks: 3

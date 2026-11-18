@@ -16,6 +16,7 @@ MonoBehaviour:
   itemName: "沉重准星"
   description: "攻击力 +1；移动速度 -15%；子弹速度 -10%。"
   kind: 1
+  rarity: 1
   availability: 2
   dropWeight: 3
   maxStacks: 3

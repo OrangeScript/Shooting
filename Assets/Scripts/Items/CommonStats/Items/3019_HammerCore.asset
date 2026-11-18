@@ -16,6 +16,7 @@ MonoBehaviour:
   itemName: "重锤弹芯"
   description: "攻击力 +2；攻击速度 -25%。适合单发高伤害。"
   kind: 1
+  rarity: 1
   availability: 2
   dropWeight: 3
   maxStacks: 2

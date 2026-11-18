@@ -16,6 +16,7 @@ MonoBehaviour:
   itemName: "超压火药"
   description: "子弹速度 +50%；攻击速度 -15%。"
   kind: 1
+  rarity: 1
   availability: 2
   dropWeight: 4
   maxStacks: 3

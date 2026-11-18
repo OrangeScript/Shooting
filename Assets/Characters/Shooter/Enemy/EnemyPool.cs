@@ -48,10 +48,10 @@ public class EnemyPool : MonoBehaviour
         return enemy;
     }
 
-    public Enemy Spawn(Vector3 position, Quaternion rotation)
+    public Enemy Spawn(Vector3 position, Quaternion rotation, int healthOverride = 0)
     {
         Enemy enemy = pool.Get();
-        enemy.Spawn(this, position, rotation);
+        enemy.Spawn(this, position, rotation, healthOverride);
         return enemy;
     }
 

@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 100
   itemName: Axe
+  rarity: 0
+  availability: 1
   maxStacks: 1
   bonusDamage: 10
   speedMultiplier: 2

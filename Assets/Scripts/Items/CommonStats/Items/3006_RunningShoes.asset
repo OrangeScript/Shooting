@@ -16,6 +16,7 @@ MonoBehaviour:
   itemName: "轻便跑鞋"
   description: "角色移动速度 +10%。"
   kind: 0
+  rarity: 0
   availability: 2
   dropWeight: 8
   maxStacks: 5

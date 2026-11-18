@@ -39,7 +39,11 @@ public class ShooterItemPickup : MonoBehaviour
         player = FindObjectOfType<ShooterPlayerHealth>();
 
         if (itemLabel != null)
-            itemLabel.text = $"{item.itemName}\n{item.description}";
+        {
+            ItemRarity rarity = ShooterLootPool.GetRarity(item);
+            itemLabel.color = ShooterLootPool.GetRarityColor(rarity);
+            itemLabel.text = $"【{ShooterLootPool.GetRarityName(rarity)}】{item.itemName}\n{item.description}";
+        }
 
         if (itemModelPoint != null && item.pickupVisualPrefab != null)
         {

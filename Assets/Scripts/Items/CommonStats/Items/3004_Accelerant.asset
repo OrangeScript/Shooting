@@ -16,6 +16,7 @@ MonoBehaviour:
   itemName: "加速药筒"
   description: "子弹速度 +20%。"
   kind: 0
+  rarity: 0
   availability: 2
   dropWeight: 8
   maxStacks: 5

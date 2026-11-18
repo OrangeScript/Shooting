@@ -18,6 +18,9 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] private int maxActiveEnemies = 25;
     [SerializeField] private bool autoStart = true;
 
+    public bool CanSpawn => isActiveAndEnabled && enemyPool != null &&
+                            enemyPool.ActiveCount < maxActiveEnemies;
+
     private IEnumerator Start()
     {
         if (!autoStart)
@@ -34,7 +37,7 @@ public class EnemySpawner : MonoBehaviour
 
     public void SpawnBatch()
     {
-        if (!isActiveAndEnabled || enemyPool == null)
+        if (!CanSpawn)
             return;
 
         for (int i = 0; i < enemiesPerWave; i++)

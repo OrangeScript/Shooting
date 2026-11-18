@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b04e18f8f0ca0634ea44520e309b29eb, type: 3}
+  m_Name: "裂魂棱镜"
+  m_EditorClassIdentifier:
+  id: 3119
+  itemName: "裂魂棱镜"
+  description: "生命上限 -5，弹速 -30%，每秒回血 -1.2 点。"
+  kind: 2
+  rarity: 4
+  availability: 2
+  dropWeight: 7
+  maxStacks: 1
+  bonusDamage: 0
+  speedMultiplier: 1
+  sizeMultiplier: 1
+  slot: 0
+  equipPrefab: {fileID: 0}
+  pickupVisualPrefab: {fileID: 2940781521704782539, guid: 10e36738f02ff9742a3c0132c8c2e9b6, type: 3}
+  sharedEffects: []
+  shooterEffects:
+  - {fileID: 11400000, guid: eb6c3e58844148909355069a502d26b7, type: 2}
+  arenaEffects: []

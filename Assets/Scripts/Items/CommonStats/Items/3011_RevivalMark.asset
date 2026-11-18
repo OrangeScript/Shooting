@@ -16,6 +16,7 @@ MonoBehaviour:
   itemName: "复苏印记"
   description: "击杀回血比例 +10 个百分点，按被击杀敌人的最大生命计算。"
   kind: 0
+  rarity: 1
   availability: 2
   dropWeight: 6
   maxStacks: 3

@@ -16,6 +16,7 @@ MonoBehaviour:
   itemName: "过载机匣"
   description: "攻击速度 +40%；攻击力 -1。最终攻击力最低为1。"
   kind: 1
+  rarity: 2
   availability: 2
   dropWeight: 4
   maxStacks: 2

@@ -16,6 +16,7 @@ MonoBehaviour:
   itemName: "密集弹匣"
   description: "攻击速度 +30%；子弹速度 -25%。"
   kind: 1
+  rarity: 1
   availability: 2
   dropWeight: 4
   maxStacks: 3

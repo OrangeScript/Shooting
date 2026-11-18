@@ -16,6 +16,7 @@ MonoBehaviour:
   itemName: "生锈弹头"
   description: "攻击力 -1。最终攻击力最低为1。"
   kind: 2
+  rarity: 4
   availability: 2
   dropWeight: 1
   maxStacks: 3

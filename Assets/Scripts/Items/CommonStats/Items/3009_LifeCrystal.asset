@@ -16,6 +16,7 @@ MonoBehaviour:
   itemName: "生命结晶"
   description: "最大生命 +8，同时增加等量当前生命。"
   kind: 0
+  rarity: 1
   availability: 2
   dropWeight: 6
   maxStacks: 3

@@ -16,6 +16,7 @@ MonoBehaviour:
   itemName: "\u65E0\u4EBA\u673A\u6838\u5FC3"
   description: "每层召唤1只自动索敌无人机，继承部分攻击力与命中效果；所有宠物合计最多12只。"
   kind: 0
+  rarity: 3
   availability: 2
   dropWeight: 1
   maxStacks: 6

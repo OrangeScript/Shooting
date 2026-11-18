@@ -16,6 +16,7 @@ MonoBehaviour:
   itemName: "汲血针"
   description: "击杀回血比例 +5 个百分点，按被击杀敌人的最大生命计算。"
   kind: 0
+  rarity: 0
   availability: 2
   dropWeight: 8
   maxStacks: 5

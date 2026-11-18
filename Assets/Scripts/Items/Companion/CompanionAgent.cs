@@ -21,6 +21,7 @@ public abstract class CompanionAgent : MonoBehaviour
     protected LayerMask EnemyMask => enemyMask;
 
     protected virtual bool LockMovement => false;
+    protected virtual bool LockTarget => false;
 
     private Collider[] searchHits = new Collider[16];
     private int slot;
@@ -57,14 +58,14 @@ public abstract class CompanionAgent : MonoBehaviour
         if (Manager == null || !Manager.CanAct)
             return;
 
-        if (!IsValidTarget(Target))
+        if (!LockTarget && !IsValidTarget(Target))
         {
             OnTargetLost();
             Target = null;
             TargetCollider = null;
         }
 
-        if (Target == null && Time.time >= nextSearchTime)
+        if (!LockTarget && Target == null && Time.time >= nextSearchTime)
         {
             nextSearchTime =
                 Time.time + Mathf.Max(0.05f, searchInterval);

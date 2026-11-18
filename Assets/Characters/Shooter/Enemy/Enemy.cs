@@ -1,4 +1,5 @@
 
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -34,6 +35,31 @@ public class Enemy : MonoBehaviour
     [SerializeField] private Transform healthAnchor;
 
     public Transform HealthAnchor => healthAnchor;
+    // 每次从对象池正式出生后通知行为组件。
+    public event Action Spawned;
+
+    public bool IsInvulnerable { get; private set; }
+
+    // 本项目隐身时同时关闭受击碰撞体。
+    // 恢复时尊重碰撞体原本的 enabled 状态。
+    public void SetInvulnerable(bool value)
+    {
+        IsInvulnerable = value;
+
+        if (hitboxes == null)
+            return;
+
+        for (int i = 0; i < hitboxes.Length; i++)
+        {
+            if (hitboxes[i] == null)
+                continue;
+
+            hitboxes[i].enabled =
+                IsAlive &&
+                !value &&
+                initialColliderStates[i];
+        }
+    }
 
     private void Awake()
     {
@@ -59,6 +85,7 @@ public class Enemy : MonoBehaviour
 
         transform.SetPositionAndRotation(position, rotation);
         IsAlive = true;
+        IsInvulnerable = false;
 
         gameObject.SetActive(true);
 
@@ -71,6 +98,7 @@ public class Enemy : MonoBehaviour
 
         enemyAnimation?.PlayWalk();
         EnemyHealthUI.Instance.Register(this);
+        Spawned?.Invoke();
     }
 
 
@@ -88,7 +116,7 @@ public class Enemy : MonoBehaviour
 
         public void TakeDamage(ShooterAttackContext attack)
     {
-        if (!IsAlive || attack.Damage <= 0)
+        if (!IsAlive || IsInvulnerable || attack.Damage <= 0)
             return;
 
         currentHealth = Mathf.Max(
@@ -145,6 +173,15 @@ public class Enemy : MonoBehaviour
         health.TakeDamage(damage);
 
         Debug.Log($"{name} 到达终点");
+        Recycle();
+    }
+
+    public void Despawn()
+    {
+        if (!gameObject.activeSelf)
+            return;
+
+        StopAllCoroutines();
         Recycle();
     }
 

@@ -14,6 +14,22 @@ public class EnemyAnimation : MonoBehaviour
     private string dieState = "Base Layer.Die";
     private string attackState = "Base Layer.Attack";
 
+    [SerializeField] private string waveState = "Base Layer.Wave";
+    [SerializeField] private string fireState = "Base Layer.Fire";
+    [SerializeField] private string idleState = "Base Layer.Idle";
+    [SerializeField] private string recoverState = "Base Layer.Recover";
+
+    public void PlayWave() => BlendTo(waveState);
+    public void PlayFire() => BlendTo(fireState);
+    public void PlayIdle() => BlendTo(idleState);
+    public void PlayRecover() => BlendTo(recoverState);
+
+    private void BlendTo(string state)
+    {
+        if (animator != null)
+            animator.CrossFadeInFixedTime(state, 0.08f, 0);
+    }
+
     private void Awake()
     {
         if (animator == null)

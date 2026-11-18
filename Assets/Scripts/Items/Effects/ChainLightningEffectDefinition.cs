@@ -84,6 +84,10 @@ public class ChainLightningEffectDefinition : ItemEffectDefinition
                 case ShooterAttackSource.DroneBullet:
                     multiplier = droneMultiplier;
                     break;
+                
+                case ShooterAttackSource.SwordPet:
+                multiplier = droneMultiplier;
+                break;
 
                 default:
                     return null;

@@ -97,6 +97,12 @@ public class HitExplosionEffectDefinition : ItemEffectDefinition
                     );
                     break;
 
+                case ShooterAttackSource.SwordPet:
+                inheritance = Mathf.Clamp01(
+                    definition.droneMultiplier
+                );
+                break;
+
                 default:
                     return null;
             }

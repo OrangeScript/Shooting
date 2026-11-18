@@ -17,6 +17,11 @@ public class EnemyRewardDrop : MonoBehaviour
     private Enemy enemy;
     private bool dropped;
 
+    public void SetReward(ItemDefinition item)
+    {
+        reward = item;
+    }
+
     private void Awake()
     {
         enemy = GetComponent<Enemy>();

@@ -24,7 +24,9 @@ public class Enemy : MonoBehaviour
     public bool IsAlive { get; private set; }
     [Header("接触伤害")]
     [SerializeField, Min(1)] private int damage = 1;
-    public int MaxHealth => Mathf.Max(1, maxHealth);
+    public int MaxHealth => runtimeMaxHealth > 0
+    ? runtimeMaxHealth
+    : Mathf.Max(1, maxHealth);
     public int CurrentHealth => currentHealth;
 
     [Header("头顶血量位置")]
@@ -38,6 +40,9 @@ public class Enemy : MonoBehaviour
     public event Action<int> Damaged;
 
     public bool IsInvulnerable { get; private set; }
+
+    [SerializeField] private bool grantKillGrowth = true;
+    private int runtimeMaxHealth;
 
     // 本项目隐身时同时关闭受击碰撞体。
     // 恢复时尊重碰撞体原本的 enabled 状态。
@@ -86,12 +91,13 @@ public class Enemy : MonoBehaviour
     public void Spawn(
         EnemyPool owner,
         Vector3 position,
-        Quaternion rotation)
+        Quaternion rotation,int healthOverride = 0)
     {
         StopAllCoroutines();
 
         pool = owner;
-        currentHealth = Mathf.Max(1, maxHealth);
+        runtimeMaxHealth = healthOverride;
+        currentHealth = MaxHealth;
 
         transform.SetPositionAndRotation(position, rotation);
         IsAlive = true;
@@ -166,7 +172,10 @@ public class Enemy : MonoBehaviour
 
         ShooterPlayerHealth killer = attack.Owner;
         if (killer != null){
-        killer.GainMaxHealth(Mathf.Max(1, maxHealth));
+            if (grantKillGrowth)
+            {
+                killer.GainMaxHealth(Mathf.Max(1, maxHealth));
+            }
         killer.GetComponent<ShooterCombatPipeline>()
             ?.ReportEnemyKilled(kill);
         }

@@ -16,36 +16,37 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] private float spawnInterval = 1f;
     [SerializeField] private int enemiesPerWave = 2;
     [SerializeField] private int maxActiveEnemies = 25;
+    [SerializeField] private bool autoStart = true;
 
     private IEnumerator Start()
     {
-        if (enemyPool == null)
-        {
-            Debug.LogError("EnemySpawner 没有绑定 EnemyPool！");
+        if (!autoStart)
             yield break;
-        }
 
-        while (true)
+        var interval = new WaitForSeconds(Mathf.Max(0.1f, spawnInterval));
+
+        while (isActiveAndEnabled)
         {
-            for (int i = 0; i < enemiesPerWave; i++)
-            {
-                if (enemyPool.ActiveCount >= maxActiveEnemies)
-                    break;
-
-                float x = Random.Range(-halfWidth, halfWidth);
-
-                Vector3 position = new Vector3(
-                    x,
-                    spawnY,
-                    spawnZ
-                );
-
-                enemyPool.Spawn(position, Quaternion.Euler(0,180,0));
-            }
-
-            yield return new WaitForSeconds(
-                Mathf.Max(0.1f, spawnInterval)
-            );
+            SpawnBatch();
+            yield return interval;
         }
     }
+
+    public void SpawnBatch()
+    {
+        if (!isActiveAndEnabled || enemyPool == null)
+            return;
+
+        for (int i = 0; i < enemiesPerWave; i++)
+        {
+            if (enemyPool.ActiveCount >= maxActiveEnemies)
+                break;
+
+            float x = Random.Range(-halfWidth, halfWidth);
+            var position = new Vector3(x, spawnY, spawnZ);
+
+            enemyPool.Spawn(position, Quaternion.Euler(0f, 180f, 0f));
+        }
+    }
+
 }

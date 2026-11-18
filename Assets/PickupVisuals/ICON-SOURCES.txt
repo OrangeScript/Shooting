@@ -1,0 +1,54 @@
+Pickup icon designs: Material Design Icons (Pictogrammers).
+Source: https://icon-sets.iconify.design/mdi/
+Upstream: https://github.com/Templarian/MaterialDesign
+Icon data: @iconify-json/mdi. Artwork color and surrounding badge adapted for Shooting.
+The icons are licensed under Apache License 2.0. See MDI-LICENSE.txt.
+
+Item ID, Iconify name
+100, mdi:axe
+101, mdi:hammer
+102, mdi:sword-cross
+103, mdi:mace
+104, mdi:shovel
+2001, mdi:drone
+2002, mdi:sword
+2005, mdi:bullet
+2006, mdi:lightning-bolt
+2007, mdi:bomb
+2008, mdi:firework
+3001, mdi:arrow-projectile
+3002, mdi:gesture-tap-button
+3003, mdi:cog-clockwise
+3004, mdi:gas-cylinder
+3005, mdi:send
+3006, mdi:shoe-sneaker
+3007, mdi:roller-skate
+3008, mdi:seed
+3009, mdi:diamond-stone
+3010, mdi:needle
+3011, mdi:heart-pulse
+3012, mdi:currency-usd-circle
+3013, mdi:incognito
+3014, mdi:bandage
+3015, mdi:flask
+3016, mdi:weather-windy
+3017, mdi:medical-bag
+3018, mdi:paw
+3019, mdi:gavel
+3020, mdi:flash-alert
+3021, mdi:fire-circle
+3022, mdi:ammunition
+3023, mdi:run-fast
+3024, mdi:shield-plus
+3025, mdi:glass-fragile
+3026, mdi:blood-bag
+3027, mdi:ghost
+3028, mdi:meditation
+3029, mdi:crosshairs-gps
+3030, mdi:shield-lock
+3031, mdi:arrow-down-bold-hexagon-outline
+3032, mdi:cog-off
+3033, mdi:water-alert
+3034, mdi:shoe-cleat
+3035, mdi:leaf-off
+3036, mdi:water-minus

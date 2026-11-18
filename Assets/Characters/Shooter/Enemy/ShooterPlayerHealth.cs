@@ -89,16 +89,28 @@ public class ShooterPlayerHealth : MonoBehaviour
         if (dodgeChance > 0f && UnityEngine.Random.value < dodgeChance)
             return;
 
+        ApplyDamage(damage);
+    }
+
+    public void Kill()
+    {
+        if (!IsDead)
+            ApplyDamage(CurrentHealth);
+    }
+
+    private void ApplyDamage(int damage)
+    {
         CurrentHealth = Mathf.Max(0, CurrentHealth - damage);
         NotifyHealthChanged();
 
-        if (IsDead)
-        {
-            Debug.Log("玩家死亡");
-            if (animator != null)
-                animator.SetTrigger("Die");
-            Died?.Invoke();
-        }
+        if (!IsDead)
+            return;
+
+        Debug.Log("玩家死亡");
+        if (animator != null)
+            animator.SetTrigger("Die");
+
+        Died?.Invoke();
     }
 
     // 保留原来的击杀永久成长；道具上限与永久成长分开计算。

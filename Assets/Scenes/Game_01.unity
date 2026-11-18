@@ -1215,7 +1215,6 @@ MonoBehaviour:
   spawnZ: 20
   spawnY: 0
   halfWidth: 4
-  autoStart: 1
   spawnInterval: 1
   enemiesPerWave: 2
   maxActiveEnemies: 15

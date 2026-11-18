@@ -21,3 +21,4 @@ MonoBehaviour:
   slot: 1
   equipPrefab: {fileID: 4745311023137676192, guid: b22f0077f187f184b9415e16123e7c50,
     type: 3}
+  pickupVisualPrefab: {fileID: 4328033931034656251, guid: 7cd73ca6138ef8943b7579cd732e59cb, type: 3}

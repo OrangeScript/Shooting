@@ -24,7 +24,7 @@ MonoBehaviour:
   sizeMultiplier: 1
   slot: 0
   equipPrefab: {fileID: 0}
-  pickupVisualPrefab: {fileID: 0}
+  pickupVisualPrefab: {fileID: 9013001476645376355, guid: 64f9ebfd85eb21d44877ff3b375e6986, type: 3}
   sharedEffects: []
   shooterEffects:
   - {fileID: 11400000, guid: f9f0be7c324c49479572bb57aa0f600b, type: 2}

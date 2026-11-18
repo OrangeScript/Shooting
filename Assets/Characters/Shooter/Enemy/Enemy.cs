@@ -5,12 +5,8 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-   
-    // [SerializeField] private float endZ = -1f;
-
-    // [Header("动画")]
-    // [SerializeField] private Animator animator;
-
+    [Header("场景手动摆放")]
+[SerializeField] private bool initializeOnStart;
 
     [Header("生命值")]
     [SerializeField] private int maxHealth = 3;
@@ -37,11 +33,25 @@ public class Enemy : MonoBehaviour
     public Transform HealthAnchor => healthAnchor;
     // 每次从对象池正式出生后通知行为组件。
     public event Action Spawned;
+    public event Action<EnemyKillContext> Killed;
+    // 非致死伤害结算后，传出剩余血量。
+    public event Action<int> Damaged;
 
     public bool IsInvulnerable { get; private set; }
 
     // 本项目隐身时同时关闭受击碰撞体。
     // 恢复时尊重碰撞体原本的 enabled 状态。
+
+        private void Start()
+    {
+        if (initializeOnStart && !IsAlive)
+        {
+            Spawn(
+                null,
+                transform.position,
+                transform.rotation);
+        }
+    }
     public void SetInvulnerable(bool value)
     {
         IsInvulnerable = value;
@@ -97,7 +107,7 @@ public class Enemy : MonoBehaviour
         }
 
         enemyAnimation?.PlayWalk();
-        EnemyHealthUI.Instance.Register(this);
+        EnemyHealthUI.Instance?.Register(this);
         Spawned?.Invoke();
     }
 
@@ -128,6 +138,8 @@ public class Enemy : MonoBehaviour
 
         if (currentHealth == 0)
             Die(attack);
+        else
+        Damaged?.Invoke(currentHealth);
     }
     
 
@@ -158,6 +170,8 @@ public class Enemy : MonoBehaviour
         killer.GetComponent<ShooterCombatPipeline>()
             ?.ReportEnemyKilled(kill);
         }
+
+        Killed?.Invoke(kill);
     }
 
     private IEnumerator DeathAndRecycle()

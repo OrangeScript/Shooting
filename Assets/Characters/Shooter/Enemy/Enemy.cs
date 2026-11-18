@@ -143,6 +143,7 @@ public class Enemy : MonoBehaviour
             currentHealth - attack.Damage
         );
 
+        AudioManager.Play(SoundEffect.EnemyHit);
         Debug.Log($"{name} HP: {currentHealth}");
 
         if (currentHealth == 0)
@@ -156,6 +157,7 @@ public class Enemy : MonoBehaviour
     {
         if(!IsAlive) return;
         IsAlive = false;
+        AudioManager.Play(SoundEffect.EnemyDeath);
         var kill = new EnemyKillContext(
             transform.position,
             MaxHealth,

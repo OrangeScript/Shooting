@@ -117,6 +117,7 @@ public class FloatingSword : CompanionAgent
             swordTrail.Clear();
             swordTrail.emitting = true;
         }
+        AudioManager.Play(SoundEffect.Sword);
     }
 
     // 动画事件：横扫结束。最后一次采样留到LateUpdate，读取本帧最终动画姿势。

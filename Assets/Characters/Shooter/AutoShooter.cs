@@ -78,6 +78,7 @@ public class AutoShooter : MonoBehaviour
             attack,
             actions
         );
+        AudioManager.Play(SoundEffect.PlayerShot);
         if (muzzleFlash != null)
         {
             muzzleFlash.Stop(

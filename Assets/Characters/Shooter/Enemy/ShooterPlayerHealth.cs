@@ -92,6 +92,7 @@ public class ShooterPlayerHealth : MonoBehaviour
     {
         CurrentHealth = Mathf.Max(0, CurrentHealth - damage);
         NotifyHealthChanged();
+        AudioManager.Play(IsDead ? SoundEffect.PlayerDeath : SoundEffect.PlayerHurt);
 
         if (!IsDead)
             return;

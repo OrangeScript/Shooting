@@ -99,6 +99,7 @@ public class ShooterItemPickup : MonoBehaviour
             return;
         }
 
+        AudioManager.Play(SoundEffect.ItemPickup);
         Debug.Log($"获得道具：{item.itemName}");
         Destroy(gameObject);
     }

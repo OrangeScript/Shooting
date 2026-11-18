@@ -215,7 +215,7 @@ MonoBehaviour:
   baseDamage: 1
   damageInheritance: 0.5
   attackPoint: {fileID: 1656917469638056683}
-  hitRadius: 0.75
+  hitRadius: 1
   idleState: Base Layer.Idle
   attackState: Base Layer.Attack
   attackTimeout: 1.5

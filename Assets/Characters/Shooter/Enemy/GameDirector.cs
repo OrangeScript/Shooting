@@ -20,6 +20,7 @@ public class GameDirector : MonoBehaviour
         public EnemySpawner spawner;
         [Range(1, 20)] public int firstWave = 1;
         [Min(1)] public int weight = 1;
+        public bool canCarryReward;
     }
 
     private enum State { Playing, Dying, Defeat, Victory }
@@ -32,8 +33,16 @@ public class GameDirector : MonoBehaviour
     [SerializeField, Min(1f)] private float firstWaveSeconds = 20f;
     [SerializeField, Min(1f)] private float lastWaveSeconds = 60f;
 
+    [Header("第 20 波难度")]
+    [SerializeField, Min(0.1f)] private float finalSpawnInterval = 0.72f;
+    [SerializeField, Min(1f)] private float finalEnemyHealth = 2.35f;
+    [SerializeField, Min(1f)] private float finalEnemyMoveSpeed = 1.3f;
+    [SerializeField, Min(1f)] private float finalEnemyDamage = 1.6f;
+    [SerializeField, Min(1f)] private float finalEnemyAttackRate = 1.5f;
+
     [Header("奖励门")]
     [SerializeField] private Enemy doorPrefab;
+    [SerializeField, Range(0f, 1f)] private float rewardEnemyChance = 0.6f;
 
     [Header("危险与 Boss")]
     [SerializeField] private RoadHazard spikePrefab;
@@ -48,6 +57,8 @@ public class GameDirector : MonoBehaviour
     private bool restarting;
     private Enemy activeBoss;
     private bool bossKilled;
+    private EnemyRewardDrop doorReward;
+    private readonly List<Enemy> rewardActors = new(4);
 
     private static List<int> pendingItems;
 
@@ -68,6 +79,7 @@ public class GameDirector : MonoBehaviour
         }
 
         Time.timeScale = 1f;
+        doorReward = doorPrefab.GetComponent<EnemyRewardDrop>();
         hud?.ResetRun();
 
         List<int> carried = pendingItems;
@@ -80,33 +92,46 @@ public class GameDirector : MonoBehaviour
 
         for (int wave = 1; wave <= waveCount; wave++)
         {
-            yield return PlayCombat(wave);
-            ClearThreats();
+            EnemyStats stats = GetWaveStats(wave);
+            yield return PlayCombat(wave, stats);
 
             BossWave boss = FindBoss(wave);
             if (boss != null)
             {
-                yield return FightBoss(wave, boss);
+                yield return FightBoss(wave, boss, stats);
 
                 if (state != State.Playing)
                     yield break;
             }
 
-            yield return PlayRewardRows(wave);
+            yield return PlayRewardRows(wave, stats);
         }
 
         if (state == State.Playing && !player.IsDead)
+        {
+            ClearThreats();
             ShowResult(true);
+        }
     }
 
-    private IEnumerator PlayCombat(int wave)
+    private EnemyStats GetWaveStats(int wave)
+    {
+        float progress = Mathf.SmoothStep(0f, 1f, (wave - 1) / 19f);
+        return new EnemyStats(
+            Mathf.Lerp(1f, finalEnemyHealth, progress),
+            Mathf.Lerp(1f, finalEnemyMoveSpeed, progress),
+            Mathf.Lerp(1f, finalEnemyDamage, progress),
+            Mathf.Lerp(1f, finalEnemyAttackRate, progress));
+    }
+
+    private IEnumerator PlayCombat(int wave, EnemyStats stats)
     {
         float progress = (wave - 1) / 19f;
         float duration = Mathf.Lerp(firstWaveSeconds, lastWaveSeconds, progress);
         float endTime = Time.time + duration;
         float nextEnemy = Time.time;
         float nextHazard = Time.time + 5f;
-        float spawnInterval = Mathf.Lerp(1.8f, 0.9f, progress);
+        float spawnInterval = Mathf.Lerp(1.8f, finalSpawnInterval, progress);
         int lastSecond = -1;
 
         while (Time.time < endTime)
@@ -121,7 +146,7 @@ public class GameDirector : MonoBehaviour
 
             if (now >= nextEnemy)
             {
-                SpawnEnemies(wave);
+                SpawnEnemies(wave, stats);
                 nextEnemy = now + spawnInterval;
             }
 
@@ -135,7 +160,7 @@ public class GameDirector : MonoBehaviour
         }
     }
 
-    private void SpawnEnemies(int wave)
+    private void SpawnEnemies(int wave, EnemyStats stats)
     {
         int totalWeight = 0;
         foreach (EnemySpawn entry in enemySpawns)
@@ -156,7 +181,7 @@ public class GameDirector : MonoBehaviour
             roll -= entry.weight;
             if (roll < 0)
             {
-                entry.spawner.SpawnBatch();
+                entry.spawner.SpawnBatch(stats);
                 return;
             }
         }
@@ -200,7 +225,7 @@ public class GameDirector : MonoBehaviour
         return null;
     }
 
-    private IEnumerator FightBoss(int wave, BossWave boss)
+    private IEnumerator FightBoss(int wave, BossWave boss, EnemyStats stats)
     {
         if (bossSpawnPoint == null || boss.pool == null)
         {
@@ -211,7 +236,7 @@ public class GameDirector : MonoBehaviour
 
         bossKilled = false;
         activeBoss = boss.pool.Spawn(
-            bossSpawnPoint.position, bossSpawnPoint.rotation, boss.health);
+            bossSpawnPoint.position, bossSpawnPoint.rotation, boss.health, stats);
         activeBoss.Killed += OnBossKilled;
         hud?.SetBoss(activeBoss);
         SetStatus($"第 {wave}/{waveCount} 波  ·  {boss.title}");
@@ -229,8 +254,6 @@ public class GameDirector : MonoBehaviour
             ShowResult(false);
             yield break;
         }
-
-        ClearEnemyProjectiles();
 
         // 保留尸体，等已有的死亡动画和延迟掉落结束。
         yield return new WaitUntil(() =>
@@ -252,7 +275,7 @@ public class GameDirector : MonoBehaviour
         activeBoss = null;
     }
 
-    private IEnumerator PlayRewardRows(int wave)
+    private IEnumerator PlayRewardRows(int wave, EnemyStats stats)
     {
         int rows = wave >= 16 ? 3 : wave >= 11 ? 2 : 1;
         int doorHealth = 3 + (wave - 1) / 3;
@@ -265,10 +288,13 @@ public class GameDirector : MonoBehaviour
             if (count == 0)
                 yield break;
 
-            SetStatus($"第 {wave}/{waveCount} 波  ·  奖励门 {row}/{rows}");
+            Enemy carrier = wave >= 4 && Random.value < rewardEnemyChance
+                ? PickRewardEnemy(wave)
+                : null;
+            int carrierSlot = carrier != null ? Random.Range(0, count) : -1;
+            SetStatus($"第 {wave}/{waveCount} 波  ·  奖励 {row}/{rows}");
 
             var slots = new List<float> { -3.75f, -1.25f, 1.25f, 3.75f };
-            var doors = new List<Enemy>(count);
 
             for (int i = 0; i < count; i++)
             {
@@ -277,31 +303,68 @@ public class GameDirector : MonoBehaviour
                 slots.RemoveAt(slotIndex);
 
                 var position = new Vector3(x, 0f, 12f);
-                Quaternion rotation = doorPrefab.transform.rotation;
-                Enemy door = Instantiate(doorPrefab, position, rotation);
+                bool isCarrier = i == carrierSlot;
+                Quaternion rotation = isCarrier
+                    ? Quaternion.Euler(0f, 180f, 0f)
+                    : doorPrefab.transform.rotation;
+                Enemy actor = Instantiate(isCarrier ? carrier : doorPrefab, position, rotation);
+                EnemyRewardDrop drop = actor.GetComponent<EnemyRewardDrop>();
 
-                door.GetComponent<EnemyRewardDrop>().SetReward(offers[i]);
-                door.Spawn(null, position, rotation, doorHealth);
-                doors.Add(door);
+                if (isCarrier)
+                {
+                    if (drop == null)
+                        drop = actor.gameObject.AddComponent<EnemyRewardDrop>();
+                    drop.ConfigureCarrier(doorReward, offers[i]);
+                    actor.Spawn(null, position, rotation, stats: stats);
+                }
+                else
+                {
+                    drop.SetReward(offers[i]);
+                    actor.Spawn(null, position, rotation, doorHealth);
+                }
+
+                rewardActors.Add(actor);
             }
 
             float timeout = Time.time + 15f;
 
             // 死亡到掉落之间还有延迟，等门回收后再看地上的奖励。
             yield return new WaitUntil(() => Time.time >= timeout ||
-                !doors.Exists(door => door != null && door.gameObject.activeSelf));
+                !rewardActors.Exists(actor => actor != null && actor.gameObject.activeSelf));
 
-            foreach (Enemy door in doors)
-            {
-                if (door == null)
-                    continue;
-
-                door.Despawn();
-                Destroy(door.gameObject);
-            }
-
+            ClearRewardActors();
             yield return WaitForPickups();
         }
+    }
+
+    private Enemy PickRewardEnemy(int wave)
+    {
+        var candidates = new List<Enemy>();
+        foreach (EnemySpawn entry in enemySpawns)
+        {
+            if (entry != null && entry.canCarryReward && wave >= entry.firstWave &&
+                entry.spawner != null && entry.spawner.isActiveAndEnabled &&
+                entry.spawner.Prefab != null)
+            {
+                candidates.Add(entry.spawner.Prefab);
+            }
+        }
+
+        return candidates.Count == 0 ? null : candidates[Random.Range(0, candidates.Count)];
+    }
+
+    private void ClearRewardActors()
+    {
+        foreach (Enemy actor in rewardActors)
+        {
+            if (actor == null)
+                continue;
+
+            actor.Despawn();
+            Destroy(actor.gameObject);
+        }
+
+        rewardActors.Clear();
     }
 
     private IEnumerator WaitForPickups()
@@ -321,6 +384,7 @@ public class GameDirector : MonoBehaviour
 
     private void ClearThreats()
     {
+        ClearRewardActors();
         foreach (Enemy enemy in FindObjectsOfType<Enemy>())
             enemy.Despawn();
 

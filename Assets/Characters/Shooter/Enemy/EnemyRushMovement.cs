@@ -49,7 +49,7 @@ public class EnemyRushMovement : MonoBehaviour
         transform.position = Vector3.MoveTowards(
             transform.position,
             destination,
-            speed * Time.deltaTime
+            enemy.Stats.ScaleMoveSpeed(speed) * Time.deltaTime
         );
     }
 

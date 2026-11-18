@@ -56,7 +56,6 @@ MonoBehaviour:
   maxHealth: 3
   deathDuration: 1.2
   damage: 2
-  grantKillGrowth: 0
   healthAnchor: {fileID: 0}
 --- !u!114 &3335599046199104181
 MonoBehaviour:

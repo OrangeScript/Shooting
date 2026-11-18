@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier:
   id: 3104
   itemName: "血祭余烬"
-  description: "攻击力 -2，击杀回血比例 -65 个百分点。"
+  description: "攻击力 -2，每次击杀回血 -0.65 点。"
   kind: 2
   rarity: 4
   availability: 2

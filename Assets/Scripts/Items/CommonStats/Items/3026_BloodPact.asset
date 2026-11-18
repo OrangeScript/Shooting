@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier:
   id: 3026
   itemName: "吸血契约"
-  description: "击杀回血比例 +25 个百分点；最大生命 -5，同时扣除等量当前生命，最低保留1点。"
+  description: "每次击杀回血 +0.25 点；最大生命 -5，同时扣除等量当前生命，最低保留1点。"
   kind: 1
   rarity: 1
   availability: 2

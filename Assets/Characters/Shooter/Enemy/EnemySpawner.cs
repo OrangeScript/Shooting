@@ -20,6 +20,7 @@ public class EnemySpawner : MonoBehaviour
 
     public bool CanSpawn => isActiveAndEnabled && enemyPool != null &&
                             enemyPool.ActiveCount < maxActiveEnemies;
+    public Enemy Prefab => enemyPool != null ? enemyPool.Prefab : null;
 
     private IEnumerator Start()
     {
@@ -35,7 +36,9 @@ public class EnemySpawner : MonoBehaviour
         }
     }
 
-    public void SpawnBatch()
+    public void SpawnBatch() => SpawnBatch(default);
+
+    public void SpawnBatch(EnemyStats stats)
     {
         if (!CanSpawn)
             return;
@@ -48,7 +51,7 @@ public class EnemySpawner : MonoBehaviour
             float x = Random.Range(-halfWidth, halfWidth);
             var position = new Vector3(x, spawnY, spawnZ);
 
-            enemyPool.Spawn(position, Quaternion.Euler(0f, 180f, 0f));
+            enemyPool.Spawn(position, Quaternion.Euler(0f, 180f, 0f), stats: stats);
         }
     }
 

@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using UnityEngine;
 
@@ -9,10 +7,8 @@ public class GamerController : MonoBehaviour
     [SerializeField] private float moveSpeed = 5f;
 
     private CharacterController controller;
-    private PlayerInput playerInput;
-
     private float horizontalInput;
-    private float verticalVelocity;
+    private float roadHeight;
     private ShooterPlayerHealth health;
     private ShooterCombatStats combatStats;
 
@@ -23,7 +19,7 @@ public class GamerController : MonoBehaviour
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
-        playerInput = GetComponent<PlayerInput>();
+        roadHeight = transform.position.y;
         health = GetComponent<ShooterPlayerHealth>();
         combatStats = GetComponent<ShooterCombatStats>();
     }
@@ -43,15 +39,11 @@ public class GamerController : MonoBehaviour
     private void Update()
     {
 
-        if (health != null && health.IsDead)
-        return;
-        // 仅允许 X 轴移动
-        Vector3 velocity = new Vector3(
-            horizontalInput * EffectiveMoveSpeed,
-            0,
-            0f
-        );
+        if ((health != null && health.IsDead) || Time.deltaTime <= 0f)
+            return;
 
-        controller.Move(velocity * Time.deltaTime);
+        // 横移继续处理碰撞。如果角色被抬高，下一帧尝试回到原路面高度。
+        float horizontal = horizontalInput * EffectiveMoveSpeed * Time.deltaTime;
+        controller.Move(new Vector3(horizontal, roadHeight - transform.position.y, 0f));
     }
 }

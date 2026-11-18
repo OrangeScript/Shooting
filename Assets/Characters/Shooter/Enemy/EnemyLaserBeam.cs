@@ -150,7 +150,7 @@ public class EnemyLaserBeam : MonoBehaviour
             {
                 // 闪避成功也消耗本次伤害间隔。
                 nextDamageAt = Time.time + damageInterval;
-                health.TakeDamage(damage);
+                health.TakeDamage(enemy.Stats.ScaleDamage(damage));
             }
 
             // 当前Game_01是单角色，多个碰撞体也只结算一次。

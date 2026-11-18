@@ -91,7 +91,7 @@ public class EnemyProximityExplosion : MonoBehaviour
         if (!target.IsDead &&
             FlatDistanceSquared() <= explosionRadius * explosionRadius)
         {
-            target.TakeDamage(damage);
+            target.TakeDamage(enemy.Stats.ScaleDamage(damage));
         }
 
         enemy.Despawn();

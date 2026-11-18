@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier:
   id: 3110
   itemName: "饥疫标记"
-  description: "移速 -10%，击杀回血比例 -50 个百分点，每秒回血 -1.5 点。"
+  description: "移速 -10%，每次击杀回血 -0.5 点，每秒回血 -1.5 点。"
   kind: 2
   rarity: 4
   availability: 2

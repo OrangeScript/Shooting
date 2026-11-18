@@ -92,7 +92,7 @@ public class EnemyMeleeAttack : MonoBehaviour
         );
 
         nextAttackTime =
-            Time.time + Mathf.Max(duration, attackCooldown);
+            Time.time + Mathf.Max(duration, enemy.Stats.ScaleCooldown(attackCooldown));
 
         if (animator != null)
             animator.Play(attackState, 0, 0f);
@@ -115,7 +115,7 @@ public class EnemyMeleeAttack : MonoBehaviour
 
             if (health != null && !health.IsDead)
             {
-                health.TakeDamage(damage);
+                health.TakeDamage(enemy.Stats.ScaleDamage(damage));
                 Debug.Log("MiniBoss 近战命中玩家！");
             }
         }

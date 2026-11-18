@@ -44,7 +44,7 @@ public class EnemyApproachMovement : MonoBehaviour
             position.z = Mathf.MoveTowards(
                 position.z,
                 stopZ,
-                speed * Time.deltaTime
+                enemy.Stats.ScaleMoveSpeed(speed) * Time.deltaTime
             );
 
             transform.position = position;

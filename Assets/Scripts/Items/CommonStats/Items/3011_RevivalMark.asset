@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier:
   id: 3011
   itemName: "复苏印记"
-  description: "击杀回血比例 +10 个百分点，按被击杀敌人的最大生命计算。"
+  description: "每次击杀提供 0.1 点回血，小数跨次累计。"
   kind: 0
   rarity: 1
   availability: 2

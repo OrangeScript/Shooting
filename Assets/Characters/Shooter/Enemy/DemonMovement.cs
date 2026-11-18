@@ -80,7 +80,7 @@ public class DemonMovement : MonoBehaviour
         position.z = Mathf.MoveTowards(
             position.z,
             targetZ,
-            approachSpeed * Time.deltaTime
+            enemy.Stats.ScaleMoveSpeed(approachSpeed) * Time.deltaTime
         );
 
         transform.position = position;
@@ -100,14 +100,14 @@ public class DemonMovement : MonoBehaviour
         position.x = Mathf.MoveTowards(
             position.x,
             player.position.x,
-            chaseSpeed * Time.deltaTime
+            enemy.Stats.ScaleMoveSpeed(chaseSpeed) * Time.deltaTime
         );
 
         // 始终尽量保持在玩家正前方
         position.z = Mathf.MoveTowards(
             position.z,
             targetZ,
-            approachSpeed * Time.deltaTime
+            enemy.Stats.ScaleMoveSpeed(approachSpeed) * Time.deltaTime
         );
 
         transform.position = position;

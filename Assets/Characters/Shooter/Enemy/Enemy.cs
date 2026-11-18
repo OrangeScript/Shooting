@@ -28,6 +28,7 @@ public class Enemy : MonoBehaviour
     ? runtimeMaxHealth
     : Mathf.Max(1, maxHealth);
     public int CurrentHealth => currentHealth;
+    public EnemyStats Stats { get; private set; }
 
     [Header("头顶血量位置")]
     [SerializeField] private Transform healthAnchor;
@@ -41,7 +42,6 @@ public class Enemy : MonoBehaviour
 
     public bool IsInvulnerable { get; private set; }
 
-    [SerializeField] private bool grantKillGrowth = true;
     private int runtimeMaxHealth;
 
     // 本项目隐身时同时关闭受击碰撞体。
@@ -91,12 +91,15 @@ public class Enemy : MonoBehaviour
     public void Spawn(
         EnemyPool owner,
         Vector3 position,
-        Quaternion rotation,int healthOverride = 0)
+        Quaternion rotation,
+        int healthOverride = 0,
+        EnemyStats stats = default)
     {
         StopAllCoroutines();
 
         pool = owner;
-        runtimeMaxHealth = healthOverride;
+        Stats = stats;
+        runtimeMaxHealth = healthOverride > 0 ? healthOverride : Stats.ScaleHealth(maxHealth);
         currentHealth = MaxHealth;
 
         transform.SetPositionAndRotation(position, rotation);
@@ -171,13 +174,10 @@ public class Enemy : MonoBehaviour
         StartCoroutine(DeathAndRecycle());
 
         ShooterPlayerHealth killer = attack.Owner;
-        if (killer != null){
-            if (grantKillGrowth)
-            {
-                killer.GainMaxHealth(Mathf.Max(1, maxHealth));
-            }
-        killer.GetComponent<ShooterCombatPipeline>()
-            ?.ReportEnemyKilled(kill);
+        if (killer != null)
+        {
+            killer.OnEnemyKilled();
+            killer.GetComponent<ShooterCombatPipeline>()?.ReportEnemyKilled(kill);
         }
 
         Killed?.Invoke(kill);
@@ -193,7 +193,7 @@ public class Enemy : MonoBehaviour
     {
         if (!IsAlive)
             return;
-        health.TakeDamage(damage);
+        health.TakeDamage(Stats.ScaleDamage(damage));
 
         Debug.Log($"{name} 到达终点");
         Recycle();

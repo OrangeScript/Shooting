@@ -17,6 +17,27 @@ public class EnemyRewardDrop : MonoBehaviour
 
     private Enemy enemy;
     private bool dropped;
+    private bool isCarrier;
+
+    public void ConfigureCarrier(EnemyRewardDrop template, ItemDefinition item)
+    {
+        isCarrier = true;
+        pickupPrefab = template.pickupPrefab;
+        spawnOffset = template.spawnOffset;
+
+        if (previewLabel == null && template.previewLabel != null)
+        {
+            Collider hitbox = GetComponent<Collider>();
+            Vector3 position = transform.position;
+            position.y = hitbox != null ? hitbox.bounds.max.y + 0.25f : position.y + 2.8f;
+            position.z = hitbox != null ? hitbox.bounds.min.z - 0.1f : position.z - 0.7f;
+            // 先按世界尺寸复制，再挂到怪物身上，兼容不同模型比例和朝向。
+            previewLabel = Instantiate(template.previewLabel, position, Quaternion.identity);
+            previewLabel.transform.SetParent(transform, true);
+        }
+
+        SetReward(item);
+    }
 
     public void SetReward(ItemDefinition item)
     {
@@ -62,9 +83,12 @@ public class EnemyRewardDrop : MonoBehaviour
         ItemRarity rarity = ShooterLootPool.GetRarity(reward);
         string rarityName = ShooterLootPool.GetRarityName(rarity);
         previewLabel.color = ShooterLootPool.GetRarityColor(rarity);
+        string title = $"【{rarityName}】{reward.itemName}";
+        if (isCarrier)
+            title = $"奖励怪\n{title}";
         previewLabel.text = rarity == ItemRarity.Curse
-            ? $"【{rarityName}】{reward.itemName}\n{reward.description}"
-            : $"【{rarityName}】{reward.itemName}";
+            ? $"{title}\n{reward.description}"
+            : title;
     }
 
     private void DropReward(EnemyKillContext context)

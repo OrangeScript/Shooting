@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier:
   id: 3018
   itemName: "掠食徽章"
-  description: "攻击力 +1；击杀回血比例 +3 个百分点。"
+  description: "攻击力 +1；每次击杀回血 +0.03 点。"
   kind: 0
   rarity: 1
   availability: 2

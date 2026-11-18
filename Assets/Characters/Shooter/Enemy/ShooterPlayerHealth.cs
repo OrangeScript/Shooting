@@ -7,18 +7,9 @@ public class ShooterPlayerHealth : MonoBehaviour
     [Header("基础生命值")]
     [SerializeField, Min(1)] private int startingMaxHealth = 10;
 
-    [Header("击杀成长")]
-    [SerializeField] private bool healOnKill = false;
-
     public int MaxHealth { get; private set; }
     public int CurrentHealth { get; private set; }
     public bool IsDead => CurrentHealth <= 0;
-    public int PermanentMaxHealth { get; private set; }
-    public float HealOnKillBaseFraction => healOnKill ? 1f : 0f;
-    public float EffectiveKillHealFraction => Mathf.Clamp(HealOnKillBaseFraction +
-        (combatStats != null ? combatStats.Totals.killHeal : 0f),
-        0f, ShooterCombatStats.MaxKillHealFraction);
-
     public event Action<int, int> HealthChanged;
     public event Action Died;
 
@@ -30,7 +21,6 @@ public class ShooterPlayerHealth : MonoBehaviour
     private void Awake()
     {
         combatStats = GetComponent<ShooterCombatStats>();
-        PermanentMaxHealth = Mathf.Max(1, startingMaxHealth);
         MaxHealth = CalculateMaxHealth();
         CurrentHealth = MaxHealth;
         animator = GetComponentInChildren<Animator>();
@@ -113,21 +103,21 @@ public class ShooterPlayerHealth : MonoBehaviour
         Died?.Invoke();
     }
 
-    // 保留原来的击杀永久成长；道具上限与永久成长分开计算。
-    public void GainMaxHealth(int amount)
+    public void OnEnemyKilled()
     {
-        if (amount <= 0 || IsDead)
+        if (IsDead || CurrentHealth >= MaxHealth)
+        {
+            killHealRemainder = 0f;
             return;
+        }
 
-        PermanentMaxHealth += amount;
-        MaxHealth = CalculateMaxHealth();
-
-        // 小比例击杀回血跨次累计，避免 3 血怪的 5% 被取整为零。
-        killHealRemainder += amount * EffectiveKillHealFraction;
+        // 道具提供每杀的回血量，小数跨次累计。敌人的最大生命不参与结算。
+        killHealRemainder += combatStats != null ? combatStats.KillHealPerEnemy : 0f;
         int healing = Mathf.FloorToInt(killHealRemainder);
         killHealRemainder -= healing;
-        CurrentHealth = Mathf.Min(MaxHealth, CurrentHealth + healing);
-        NotifyHealthChanged();
+        Heal(healing);
+        if (CurrentHealth >= MaxHealth)
+            killHealRemainder = 0f;
     }
 
     public void Heal(int amount)
@@ -140,7 +130,7 @@ public class ShooterPlayerHealth : MonoBehaviour
 
     private int CalculateMaxHealth()
     {
-        return Mathf.Max(1, PermanentMaxHealth +
+        return Mathf.Max(1, startingMaxHealth +
             (combatStats != null ? combatStats.Totals.maxHealth : 0));
     }
 

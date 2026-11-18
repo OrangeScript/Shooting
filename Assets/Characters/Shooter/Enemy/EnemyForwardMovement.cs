@@ -22,7 +22,7 @@ public class EnemyForwardMovement : MonoBehaviour
             return;
 
         transform.position +=
-            Vector3.back * speed * Time.deltaTime;
+            Vector3.back * enemy.Stats.ScaleMoveSpeed(speed) * Time.deltaTime;
 
         if (transform.position.z > endZ)
             return;

@@ -13,12 +13,14 @@ public class EnemyProjectile : MonoBehaviour
 
     private Vector3 direction;
     private float remainingLifetime;
+    private int hitDamage;
     private bool launched;
 
-    public void Launch(Vector3 shootDirection)
+    public void Launch(Vector3 shootDirection, EnemyStats stats = default)
     {
         direction = shootDirection.normalized;
         remainingLifetime = lifetime;
+        hitDamage = stats.ScaleDamage(damage);
         launched = true;
     }
 
@@ -43,7 +45,7 @@ public class EnemyProjectile : MonoBehaviour
                 hit.collider.GetComponentInParent<ShooterPlayerHealth>();
 
             if (health != null)
-                health.TakeDamage(damage);
+                health.TakeDamage(hitDamage);
 
             Destroy(gameObject);
             return;

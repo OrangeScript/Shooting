@@ -16,6 +16,7 @@ public class EnemyPool : MonoBehaviour
 
     public int InactiveCount =>
         pool == null ? 0 : pool.CountInactive;
+    public Enemy Prefab => enemyPrefab;
 
     private void Awake()
     {
@@ -48,10 +49,11 @@ public class EnemyPool : MonoBehaviour
         return enemy;
     }
 
-    public Enemy Spawn(Vector3 position, Quaternion rotation, int healthOverride = 0)
+    public Enemy Spawn(
+        Vector3 position, Quaternion rotation, int healthOverride = 0, EnemyStats stats = default)
     {
         Enemy enemy = pool.Get();
-        enemy.Spawn(this, position, rotation, healthOverride);
+        enemy.Spawn(this, position, rotation, healthOverride, stats);
         return enemy;
     }
 

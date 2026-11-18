@@ -27,7 +27,7 @@ public class EnemyRangedAttack : MonoBehaviour
     private void OnEnable()
     {
         // 每次从对象池取出，重置攻击冷却
-        timer = Mathf.Max(0.1f, fireInterval);
+        timer = Mathf.Max(0.1f, enemy.Stats.ScaleCooldown(fireInterval));
     }
 
     private void Update()
@@ -57,7 +57,7 @@ public class EnemyRangedAttack : MonoBehaviour
         if (timer > 0f)
             return;
 
-        timer = Mathf.Max(0.1f, fireInterval);
+        timer = Mathf.Max(0.1f, enemy.Stats.ScaleCooldown(fireInterval));
 
         Fire();
     }
@@ -81,6 +81,6 @@ public class EnemyRangedAttack : MonoBehaviour
             Quaternion.LookRotation(direction)
         );
         animation?.PlayAttack();
-        projectile.Launch(direction);
+        projectile.Launch(direction, enemy.Stats);
     }
 }

@@ -16,7 +16,7 @@ public struct ShooterStatModifiers : IEquatable<ShooterStatModifiers>
     public float projectileSpeed;
     [Tooltip("每层角色移速加法修正：0.1为+10%。")]
     public float moveSpeed;
-    [Tooltip("击杀回血增加的比例：0.05为+5个百分点，乘以死者最大生命。")]
+    [Tooltip("每次击杀的回血量修正。0.05 表示累计 0.05 点生命。")]
     public float killHeal;
     [Tooltip("闪避概率修正：0.04为+4个百分点；总概率最高65%。")]
     public float dodge;
@@ -77,7 +77,7 @@ public class ShooterCombatStats : MonoBehaviour
     public const float MinMoveSpeedMultiplier = 0.35f;
     public const float MaxMoveSpeedMultiplier = 2.5f;
     public const float MaxDodgeChance = 0.65f;
-    public const float MaxKillHealFraction = 2f;
+    public const float MaxKillHealPerEnemy = 1f;
     public const float MaxRegeneration = 5f;
 
     public ShooterStatModifiers Totals { get; private set; }
@@ -89,7 +89,7 @@ public class ShooterCombatStats : MonoBehaviour
     public float MoveSpeedMultiplier => Mathf.Clamp(1f + Totals.moveSpeed,
         MinMoveSpeedMultiplier, MaxMoveSpeedMultiplier);
     public float DodgeChance => Mathf.Clamp(Totals.dodge, 0f, MaxDodgeChance);
-    public float KillHealFraction => Mathf.Clamp(Totals.killHeal, 0f, MaxKillHealFraction);
+    public float KillHealPerEnemy => Mathf.Clamp(Totals.killHeal, 0f, MaxKillHealPerEnemy);
     public float Regeneration => Mathf.Clamp(Totals.regeneration, 0f, MaxRegeneration);
 
     public event Action Changed;

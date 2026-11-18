@@ -83,7 +83,7 @@ public class EnemyAttackCycle : MonoBehaviour
                 break;
 
             case Phase.Firing:
-                Enter(Phase.Cooldown, cooldownTime, onCooldown);
+                Enter(Phase.Cooldown, enemy.Stats.ScaleCooldown(cooldownTime), onCooldown);
                 break;
 
             case Phase.Cooldown:

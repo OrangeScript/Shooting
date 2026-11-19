@@ -1,0 +1,119 @@
+
+/* ===== 屏幕根节点：完全透明 ===== */
+.menu-root {
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+/* ===== 左上角游戏标题 ===== */
+.brand {
+    position: absolute;
+    left: 70px;
+    top: 65px;
+}
+
+.brand-title {
+    font-size: 66px;
+    -unity-font-style: bold;
+    color: #FFFFFF;
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: #263038;
+}
+
+.brand-subtitle {
+    font-size: 16px;
+    color: #D9C4A1;
+    letter-spacing: 3px;
+    margin-top: 6px;
+}
+
+/* ===== 左下角菜单整体 ===== */
+.bottom-menu {
+    position: absolute;
+    left: 70px;
+    bottom: 60px;
+    width: 340px;
+}
+
+.menu-page {
+    width: 100%;
+    flex-direction: column;
+}
+
+/* ===== 按钮：默认状态 ===== */
+.menu-button {
+    width: 100%;
+    height: 57px;
+
+    margin-bottom: 9px;
+    padding-left: 24px;
+
+    font-size: 23px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-left;
+
+    color: #F1F1F1;
+
+    /* 默认只有淡淡的底色 */
+    background-color: rgba(12, 18, 25, 0.08);
+
+    /* 非常淡的细边框 */
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-right-width: 1px;
+
+    border-top-color: rgba(225, 235, 245, 0.20);
+    border-bottom-color: rgba(225, 235, 245, 0.20);
+    border-left-color: rgba(225, 235, 245, 0.20);
+    border-right-color: rgba(225, 235, 245, 0.20);
+
+    border-radius: 12px;
+
+    /* 平滑过渡 */
+    transition-property: background-color, color;
+    transition-duration: 0.15s;
+}
+
+/* ===== 鼠标悬停：略微提亮 ===== */
+.menu-button:hover {
+    color: #FFFFFF;
+
+    background-color: rgba(235, 245, 255, 0.16);
+
+    border-top-color: rgba(245, 250, 255, 0.62);
+    border-bottom-color: rgba(245, 250, 255, 0.62);
+    border-left-color: rgba(245, 250, 255, 0.62);
+    border-right-color: rgba(245, 250, 255, 0.62);
+}
+
+/* 鼠标按下时 */
+.menu-button:active {
+    background-color: rgba(235, 245, 255, 0.24);
+}
+
+/* ===== 二级菜单文字 ===== */
+.page-title {
+    font-size: 30px;
+    color: #FFFFFF;
+    -unity-font-style: bold;
+    margin-bottom: 22px;
+}
+
+.page-hint {
+    font-size: 19px;
+    color: #C3CBD2;
+    margin-bottom: 28px;
+}
+.brand-title {
+    font-size: 80px;
+    color: #FF0000;
+}
+
+.bottom-menu {
+    position: absolute;
+    left: 60px;
+    bottom: 40px;
+    width: 310px;
+}

@@ -98,6 +98,10 @@ public class ShooterItemPickup : MonoBehaviour
             collected = false;
             return;
         }
+        if (ShooterLootPool.GetRarity(item) == ItemRarity.Legendary)
+            {
+                inventory.GetComponent<LegendaryPickupCutscene>()?.Play();
+            }
 
         AudioManager.Play(SoundEffect.ItemPickup);
         Debug.Log($"获得道具：{item.itemName}");

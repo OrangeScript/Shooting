@@ -11,7 +11,8 @@ public enum SoundEffect
     [InspectorName("拾取道具")] ItemPickup = 5,
     [InspectorName("爆炸")] Boom = 6,
     [InspectorName("闪电")] Lightning = 7,
-    [InspectorName("剑")] Sword = 8
+    [InspectorName("剑")] Sword = 8,
+    [InspectorName("传奇道具获取")] Legendary = 9,
 }
 
 public sealed class SoundEffectLibrary : ScriptableObject

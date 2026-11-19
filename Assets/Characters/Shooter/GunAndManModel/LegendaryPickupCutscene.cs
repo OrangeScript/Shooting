@@ -12,5 +12,6 @@ public sealed class LegendaryPickupCutscene : MonoBehaviour
 
         director.time = 0d;
         director.Play();
+        AudioManager.Play(SoundEffect.Legendary);
     }
 }

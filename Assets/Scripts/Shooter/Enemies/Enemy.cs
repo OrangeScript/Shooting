@@ -39,6 +39,7 @@ public class Enemy : MonoBehaviour
     public event Action<EnemyKillContext> Killed;
     // 非致死伤害结算后，传出剩余血量。
     public event Action<int> Damaged;
+    public event Action Recycled;
 
     public bool IsInvulnerable { get; private set; }
 
@@ -201,6 +202,18 @@ public class Enemy : MonoBehaviour
         Recycle();
     }
 
+    public void ApplyReplicatedHealth(int current, int maximum)
+    {
+        initializeOnStart = false;
+        runtimeMaxHealth = maximum;
+        currentHealth = current;
+        IsAlive = current > 0;
+        if (IsAlive)
+            EnemyHealthUI.Instance?.Register(this);
+        else
+            EnemyHealthUI.Instance?.Unregister(this);
+    }
+
     public void Despawn()
     {
         if (!gameObject.activeSelf)
@@ -217,6 +230,8 @@ public class Enemy : MonoBehaviour
 
         if (pool != null)
             pool.Release(this);
+        else if (Recycled != null)
+            Recycled.Invoke();
         else
             gameObject.SetActive(false);
     }

@@ -59,6 +59,11 @@ public class GameDirector : MonoBehaviour
     private bool bossKilled;
     private EnemyRewardDrop doorReward;
     private readonly List<Enemy> rewardActors = new(4);
+    private IReadOnlyList<ShooterPlayerHealth> coopPlayers;
+    private System.Action<EnemyStats> spawnCoopBatch;
+    private bool coop;
+    public event System.Action<string> CoopStatusChanged;
+    public event System.Action<bool> CoopFinished;
 
     private static List<int> pendingItems;
 
@@ -70,6 +75,8 @@ public class GameDirector : MonoBehaviour
 
     private IEnumerator Start()
     {
+        if (coop)
+            yield break;
         if (player == null || inventory == null || inventory.Database == null ||
             enemySpawns == null || enemySpawns.Length == 0 ||
             doorPrefab == null || doorPrefab.GetComponent<EnemyRewardDrop>() == null)
@@ -89,11 +96,44 @@ public class GameDirector : MonoBehaviour
             inventory.Core.Restore(carried);
 
         player.Died += OnPlayerDied;
+        yield return RunWaves(waveCount);
+    }
 
-        for (int wave = 1; wave <= waveCount; wave++)
+    public void PrepareCoop()
+    {
+        coop = true;
+    }
+
+    public void BeginCoop(IReadOnlyList<ShooterPlayerHealth> players, int waves,
+        System.Action<EnemyStats> spawnBatch)
+    {
+        coopPlayers = players;
+        spawnCoopBatch = spawnBatch;
+        foreach (ShooterPlayerHealth member in players)
+            member.Died += OnPlayerDied;
+        StartCoroutine(RunWaves(waves));
+    }
+
+    private bool HasLivingPlayer()
+    {
+        if (!coop)
+            return player != null && !player.IsDead;
+        if (coopPlayers == null)
+            return false;
+        foreach (ShooterPlayerHealth member in coopPlayers)
+            if (member != null && !member.IsDead)
+                return true;
+        return false;
+    }
+
+    private IEnumerator RunWaves(int totalWaves)
+    {
+        for (int wave = 1; wave <= totalWaves; wave++)
         {
             EnemyStats stats = GetWaveStats(wave);
-            yield return PlayCombat(wave, stats);
+            yield return PlayCombat(wave, totalWaves, stats);
+            if (coop)
+                continue;
 
             BossWave boss = FindBoss(wave);
             if (boss != null)
@@ -107,7 +147,7 @@ public class GameDirector : MonoBehaviour
             yield return PlayRewardRows(wave, stats);
         }
 
-        if (state == State.Playing && !player.IsDead)
+        if (state == State.Playing && HasLivingPlayer())
         {
             ClearThreats();
             ShowResult(true);
@@ -124,7 +164,7 @@ public class GameDirector : MonoBehaviour
             Mathf.Lerp(1f, finalEnemyAttackRate, progress));
     }
 
-    private IEnumerator PlayCombat(int wave, EnemyStats stats)
+    private IEnumerator PlayCombat(int wave, int totalWaves, EnemyStats stats)
     {
         float progress = (wave - 1) / 19f;
         float duration = Mathf.Lerp(firstWaveSeconds, lastWaveSeconds, progress);
@@ -141,16 +181,19 @@ public class GameDirector : MonoBehaviour
             if (seconds != lastSecond)
             {
                 lastSecond = seconds;
-                SetStatus($"第 {wave}/{waveCount} 波  ·  {seconds}s");
+                SetStatus($"第 {wave}/{totalWaves} 波  ·  {seconds}s");
             }
 
             if (now >= nextEnemy)
             {
-                SpawnEnemies(wave, stats);
+                if (coop)
+                    spawnCoopBatch(stats);
+                else
+                    SpawnEnemies(wave, stats);
                 nextEnemy = now + spawnInterval;
             }
 
-            if (wave >= 6 && now >= nextHazard && endTime - now > 6f)
+            if (!coop && wave >= 6 && now >= nextHazard && endTime - now > 6f)
             {
                 SpawnHazard(wave);
                 nextHazard = now + Random.Range(9f, 14f);
@@ -406,9 +449,21 @@ public class GameDirector : MonoBehaviour
         }
     }
 
+    public void CheckCoopTeam()
+    {
+        if (coop && coopPlayers != null)
+            OnPlayerDied();
+    }
+
+    public void RemoveCoopPlayer(ShooterPlayerHealth member)
+    {
+        if (member != null)
+            member.Died -= OnPlayerDied;
+    }
+
     private void OnPlayerDied()
     {
-        if (state != State.Playing)
+        if (state != State.Playing || (coop && HasLivingPlayer()))
             return;
 
         state = State.Dying;
@@ -429,6 +484,11 @@ public class GameDirector : MonoBehaviour
     {
         state = won ? State.Victory : State.Defeat;
         SetStatus(won ? "通关！" : "本局结束");
+        if (coop)
+        {
+            CoopFinished?.Invoke(won);
+            return;
+        }
         hud?.SetBoss(null);
         hud?.ShowResult(won);
         Time.timeScale = 0f;
@@ -447,7 +507,7 @@ public class GameDirector : MonoBehaviour
 
     private void Restart(bool keepItems)
     {
-        if (restarting || (state != State.Defeat && state != State.Victory))
+        if (coop || restarting || (state != State.Defeat && state != State.Victory))
             return;
 
         int sceneIndex = SceneManager.GetActiveScene().buildIndex;
@@ -465,7 +525,10 @@ public class GameDirector : MonoBehaviour
 
     private void SetStatus(string message)
     {
-        hud?.SetStatus(message);
+        if (coop)
+            CoopStatusChanged?.Invoke(message);
+        else
+            hud?.SetStatus(message);
     }
 
     private void OnDisable()
@@ -475,5 +538,9 @@ public class GameDirector : MonoBehaviour
 
         if (player != null)
             player.Died -= OnPlayerDied;
+        if (coopPlayers != null)
+            foreach (ShooterPlayerHealth member in coopPlayers)
+                if (member != null)
+                    member.Died -= OnPlayerDied;
     }
 }

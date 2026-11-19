@@ -27,5 +27,15 @@ public readonly struct EnemyStats
 
     public float ScaleCooldown(float seconds) => seconds / Multiplier(attackRateMultiplier);
 
+    public EnemyStats ForTeam(int playerCount, float extraHealth, float extraSpeed, float extraDamage)
+    {
+        int extraPlayers = Mathf.Max(0, playerCount - 1);
+        return new EnemyStats(
+            Multiplier(healthMultiplier) * (1f + extraHealth * extraPlayers),
+            Multiplier(moveMultiplier) * (1f + extraSpeed * extraPlayers),
+            Multiplier(damageMultiplier) * (1f + extraDamage * extraPlayers),
+            Multiplier(attackRateMultiplier));
+    }
+
     private static float Multiplier(float value) => value > 0f ? value : 1f;
 }

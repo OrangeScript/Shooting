@@ -10,6 +10,7 @@ public class Bullet : MonoBehaviour
     private BulletPool pool;
     private float remainingLifetime;
     private float flightSpeed;
+    private bool visualOnly;
 
 
     [Header("命中检测")]
@@ -28,9 +29,11 @@ public class Bullet : MonoBehaviour
         BulletPool ownerPool,
         Vector3 position,
         Quaternion rotation,ShooterAttackContext attack,
-        IProjectileHitAction[] actions)
+        IProjectileHitAction[] actions,
+        bool isVisualOnly = false)
     {
         pool = ownerPool;
+        visualOnly = isVisualOnly;
         this.attacker = attack;
         flightSpeed = speed * (attack.ProjectileSpeedMultiplier > 0f
             ? attack.ProjectileSpeedMultiplier : 1f);
@@ -54,6 +57,11 @@ public class Bullet : MonoBehaviour
     {
         if (!inFlight)
             return;
+        if (visualOnly)
+        {
+            Advance(flightSpeed * Time.deltaTime, transform.forward);
+            return;
+        }
 
         // 敌人在 Update 中移动，等移动结束后同步；所有子弹每帧共用一次同步。
         if (lastPhysicsSyncFrame != Time.frameCount)
@@ -87,7 +95,12 @@ public class Bullet : MonoBehaviour
             Recycle();
             return;
         }
-        transform.position += direction* distance;
+        Advance(distance, direction);
+    }
+
+    private void Advance(float distance, Vector3 direction)
+    {
+        transform.position += direction * distance;
 
         remainingLifetime -= Time.deltaTime;
 

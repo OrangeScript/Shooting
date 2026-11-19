@@ -154,4 +154,16 @@ public class ShooterPlayerHealth : MonoBehaviour
     {
         HealthChanged?.Invoke(CurrentHealth, MaxHealth);
     }
+
+    public void ApplyReplicatedHealth(int current, int maximum, bool playFeedback)
+    {
+        bool tookDamage = current < CurrentHealth;
+        MaxHealth = Mathf.Max(1, maximum);
+        CurrentHealth = Mathf.Clamp(current, 0, MaxHealth);
+        NotifyHealthChanged();
+        if (IsDead && tookDamage)
+            animator?.SetTrigger("Die");
+        if (playFeedback && tookDamage)
+            AudioManager.Play(IsDead ? SoundEffect.PlayerDeath : SoundEffect.PlayerHurt);
+    }
 }

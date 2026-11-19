@@ -55,4 +55,18 @@ public class EnemySpawner : MonoBehaviour
         }
     }
 
+    public void SpawnTeamBatch(EnemyStats stats, int teamSize, int activeCount,
+        float centerX, float teamHalfWidth, float extraDepth,
+        System.Action<Vector3, Quaternion, EnemyStats> spawn)
+    {
+        int count = Mathf.Clamp(maxActiveEnemies * teamSize - activeCount,
+            0, enemiesPerWave * teamSize);
+        for (int i = 0; i < count; i++)
+        {
+            float laneWidth = 2f * teamHalfWidth / count;
+            float x = centerX - teamHalfWidth + (i + Random.value) * laneWidth;
+            float z = spawnZ + Random.Range(0f, extraDepth);
+            spawn(new Vector3(x, spawnY, z), Quaternion.Euler(0f, 180f, 0f), stats);
+        }
+    }
 }

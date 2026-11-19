@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 public class AutoShooter : MonoBehaviour
@@ -23,6 +22,7 @@ public class AutoShooter : MonoBehaviour
 
     private ShooterCombatStats combatStats;
     private ShooterCombatPipeline combatPipeline;
+    public event Action<Vector3, Quaternion, float> ShotFired;
 
     public int BaseDamage => baseDamage;
     public float BaseFireInterval => fireInterval;
@@ -78,6 +78,17 @@ public class AutoShooter : MonoBehaviour
             attack,
             actions
         );
+        PlayShotFeedback();
+        ShotFired?.Invoke(firePoint.position, firePoint.rotation, attack.ProjectileSpeedMultiplier);
+    }
+
+    public void BindBulletPool(BulletPool pool)
+    {
+        bulletPool = pool;
+    }
+
+    public void PlayShotFeedback()
+    {
         AudioManager.Play(SoundEffect.PlayerShot);
         if (muzzleFlash != null)
         {

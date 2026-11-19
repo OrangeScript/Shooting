@@ -18,6 +18,8 @@ public sealed class ShooterRunHUD : MonoBehaviour
     private Label resultDetails;
     private Button restartFresh;
     private Button restartKeepingItems;
+    private Button leaveRoom;
+    private System.Action exitCoop;
 
     private string statusMessage = "准备开始";
     private bool? victory;
@@ -57,6 +59,7 @@ public sealed class ShooterRunHUD : MonoBehaviour
         resultDetails = root.Q<Label>("RunResultDetails");
         restartFresh = root.Q<Button>("RunRestartFresh");
         restartKeepingItems = root.Q<Button>("RunRestartKeepingItems");
+        leaveRoom = root.Q<Button>("RunLeaveRoom");
 
         if (status == null || bossPanel == null || bossHealth == null || bossHealthFill == null ||
             resultPanel == null || resultCard == null || resultTitle == null || resultDetails == null ||
@@ -66,6 +69,9 @@ public sealed class ShooterRunHUD : MonoBehaviour
         root.pickingMode = PickingMode.Ignore;
         restartFresh.clicked += OnRestartFresh;
         restartKeepingItems.clicked += OnRestartKeepingItems;
+        if (leaveRoom != null)
+            leaveRoom.clicked += LeaveCoop;
+        RefreshLeaveButton();
         bound = true;
 
         SetStatus(statusMessage);
@@ -81,6 +87,8 @@ public sealed class ShooterRunHUD : MonoBehaviour
 
         restartFresh.clicked -= OnRestartFresh;
         restartKeepingItems.clicked -= OnRestartKeepingItems;
+        if (leaveRoom != null)
+            leaveRoom.clicked -= LeaveCoop;
         bound = false;
     }
 
@@ -139,6 +147,24 @@ public sealed class ShooterRunHUD : MonoBehaviour
         RefreshResult();
     }
 
+    public void SetCoopExit(System.Action exit)
+    {
+        exitCoop = exit;
+        RefreshLeaveButton();
+        RefreshResult();
+    }
+
+    private void RefreshLeaveButton()
+    {
+        if (leaveRoom != null)
+            leaveRoom.style.display = exitCoop != null ? DisplayStyle.Flex : DisplayStyle.None;
+    }
+
+    private void LeaveCoop()
+    {
+        exitCoop?.Invoke();
+    }
+
     private void RefreshResult()
     {
         if (!bound)
@@ -151,6 +177,14 @@ public sealed class ShooterRunHUD : MonoBehaviour
         bool won = victory.Value;
         resultCard.EnableInClassList("victory", won);
         resultTitle.text = won ? "通关" : "本局结束";
+        if (exitCoop != null)
+        {
+            resultDetails.text = won ? "小队完成合作波次。" : "小队已全员倒下。";
+            restartKeepingItems.EnableInClassList(HiddenClass, true);
+            restartFresh.text = "返回主菜单";
+            restartFresh.EnableInClassList("run-result-button-primary", true);
+            return;
+        }
         resultDetails.text = won ? "选择是否带着本局道具重开。" : "重开后从第 1 波开始。";
         restartKeepingItems.EnableInClassList(HiddenClass, !won);
         restartFresh.text = won ? "从零重开" : "重新开始";
@@ -159,7 +193,9 @@ public sealed class ShooterRunHUD : MonoBehaviour
 
     private void OnRestartFresh()
     {
-        if (director != null)
+        if (exitCoop != null)
+            LeaveCoop();
+        else if (director != null)
             director.RestartFresh();
     }
 

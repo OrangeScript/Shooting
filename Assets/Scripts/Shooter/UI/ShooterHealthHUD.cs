@@ -55,6 +55,7 @@ public class ShooterHealthHUD : MonoBehaviour
     private int lastHP;
     private int lastMaxHP;
     private bool started;
+    private bool explicitPlayer;
 
     private void OnEnable()
     {
@@ -93,8 +94,10 @@ public class ShooterHealthHUD : MonoBehaviour
 
     private void BindPlayer()
     {
-        if (player == null)
+        if (player == null && !explicitPlayer)
             player = FindObjectOfType<ShooterPlayerHealth>();
+        if (player == null && explicitPlayer)
+            return;
 
         if (player == null || healthBarBG == null || layerBaseFill == null ||
             healthFill == null || growthFill == null || growthWrapFill == null || healthText == null)
@@ -106,6 +109,16 @@ public class ShooterHealthHUD : MonoBehaviour
         player.HealthChanged -= OnHealthChanged;
         player.HealthChanged += OnHealthChanged;
         InitializeBar(player.CurrentHealth, player.MaxHealth);
+    }
+
+    public void SetCoopPlayer(ShooterPlayerHealth nextPlayer)
+    {
+        if (player != null)
+            player.HealthChanged -= OnHealthChanged;
+        explicitPlayer = true;
+        player = nextPlayer;
+        if (isActiveAndEnabled && started)
+            BindPlayer();
     }
 
     private void OnDisable()

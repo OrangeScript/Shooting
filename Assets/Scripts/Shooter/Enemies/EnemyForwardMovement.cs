@@ -1,4 +1,5 @@
 
+using System;
 using UnityEngine;
 
 [RequireComponent(typeof(Enemy))]
@@ -10,6 +11,7 @@ public class EnemyForwardMovement : MonoBehaviour
     [SerializeField] private bool damageAtEnd = true;
 
     private Enemy enemy;
+    public Func<Vector3, ShooterPlayerHealth> SelectEndTarget { get; set; }
 
     private void Awake()
     {
@@ -33,8 +35,9 @@ public class EnemyForwardMovement : MonoBehaviour
             return;
         }
 
-        ShooterPlayerHealth player =
-            FindObjectOfType<ShooterPlayerHealth>();
+        ShooterPlayerHealth player = SelectEndTarget != null
+            ? SelectEndTarget(transform.position)
+            : FindObjectOfType<ShooterPlayerHealth>();
 
         if (player != null)
             enemy.ReachEnd(player);

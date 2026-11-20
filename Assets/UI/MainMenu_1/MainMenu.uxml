@@ -14,10 +14,43 @@
                 <ui:Button name="QuitButton" text="退出游戏" class="menu-button" />
             </ui:VisualElement>
             <ui:VisualElement name="MultiplayerPage" class="menu-page" style="display: none;">
+
                 <ui:Label text="多人游戏" class="page-title" />
-                <ui:Button name="CreateButton" text="创建游戏" class="menu-button" />
-                <ui:Button name="JoinButton" text="加入游戏" class="menu-button" />
-                <ui:Button name="MultiBackButton" text="← 返回" class="menu-button" />
+
+                <ui:Button
+                    name="CreateButton"
+                    text="创建游戏"
+                    class="menu-button" />
+
+                <ui:Button
+                    name="JoinButton"
+                    text="加入游戏"
+                    class="menu-button" />
+
+                <!-- 房主 IP 输入框 -->
+                <ui:TextField
+                    name="RoomAddress"
+                    label="房主 IP"
+                    value="127.0.0.1"
+                    class="room-address" />
+
+                <!-- 开始合作按钮 -->
+                <ui:Button
+                    name="RoomStartButton"
+                    text="开始合作"
+                    class="menu-button" />
+
+                <!-- 房间状态 -->
+                <ui:Label
+                    name="RoomStatus"
+                    text="请输入房主地址"
+                    class="page-hint" />
+
+                <ui:Button
+                    name="MultiBackButton"
+                    text="← 返回"
+                    class="menu-button" />
+
             </ui:VisualElement>
             <ui:VisualElement name="InfoPage" class="menu-page" style="display: none;">
                 <ui:Label name="InfoTitle" class="page-title" />

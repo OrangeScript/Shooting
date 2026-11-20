@@ -117,3 +117,50 @@
     bottom: 40px;
     width: 310px;
 }
+
+/* ===== 房间 IP 输入框 ===== */
+
+.room-address {
+    width: 100%;
+    margin-top: 12px;
+    margin-bottom: 16px;
+
+    font-size: 18px;
+    color: #FFFFFF;
+}
+
+.room-address .unity-text-field__label {
+    color: #D9C4A1;
+    font-size: 18px;
+    min-width: 85px;
+}
+
+.room-address .unity-text-field__input {
+    min-height: 42px;
+    padding-left: 12px;
+
+    background-color: rgba(12, 18, 25, 0.28);
+    color: #FFFFFF;
+
+    border-radius: 8px;
+
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-right-width: 1px;
+
+    border-top-color: rgba(225, 235, 245, 0.25);
+    border-bottom-color: rgba(225, 235, 245, 0.25);
+    border-left-color: rgba(225, 235, 245, 0.25);
+    border-right-color: rgba(225, 235, 245, 0.25);
+}
+
+/* ===== 房间状态文字 ===== */
+
+#RoomStatus {
+    font-size: 16px;
+    color: #C3CBD2;
+
+    margin-top: 8px;
+    margin-bottom: 18px;
+}

@@ -20,6 +20,7 @@ public class Enemy : MonoBehaviour
 
     private Collider[] hitboxes;
     private bool[] initialColliderStates;
+    private bool isReplica;
 
     public bool IsAlive { get; private set; }
     [Header("接触伤害")]
@@ -50,7 +51,7 @@ public class Enemy : MonoBehaviour
 
         private void Start()
     {
-        if (initializeOnStart && !IsAlive)
+        if (!isReplica && initializeOnStart && !IsAlive)
         {
             Spawn(
                 null,
@@ -60,6 +61,9 @@ public class Enemy : MonoBehaviour
     }
     public void SetInvulnerable(bool value)
     {
+        if (isReplica)
+            return;
+
         IsInvulnerable = value;
 
         if (hitboxes == null)
@@ -96,6 +100,9 @@ public class Enemy : MonoBehaviour
         int healthOverride = 0,
         EnemyStats stats = default)
     {
+        if (isReplica)
+            return;
+
         StopAllCoroutines();
 
         pool = owner;
@@ -136,7 +143,7 @@ public class Enemy : MonoBehaviour
 
         public void TakeDamage(ShooterAttackContext attack)
     {
-        if (!IsAlive || IsInvulnerable || attack.Damage <= 0)
+        if (isReplica || !IsAlive || IsInvulnerable || attack.Damage <= 0)
             return;
 
         currentHealth = Mathf.Max(
@@ -194,7 +201,7 @@ public class Enemy : MonoBehaviour
 
     public void ReachEnd(ShooterPlayerHealth health)
     {
-        if (!IsAlive)
+        if (isReplica || !IsAlive)
             return;
         health.TakeDamage(Stats.ScaleDamage(damage));
 
@@ -202,9 +209,19 @@ public class Enemy : MonoBehaviour
         Recycle();
     }
 
+    public void PrepareReplica()
+    {
+        isReplica = true;
+        foreach (Collider hitbox in hitboxes)
+            if (hitbox != null)
+                hitbox.enabled = false;
+    }
+
     public void ApplyReplicatedHealth(int current, int maximum)
     {
-        initializeOnStart = false;
+        if (!isReplica)
+            return;
+
         runtimeMaxHealth = maximum;
         currentHealth = current;
         IsAlive = current > 0;
@@ -216,7 +233,7 @@ public class Enemy : MonoBehaviour
 
     public void Despawn()
     {
-        if (!gameObject.activeSelf)
+        if (isReplica || !gameObject.activeSelf)
             return;
 
         StopAllCoroutines();

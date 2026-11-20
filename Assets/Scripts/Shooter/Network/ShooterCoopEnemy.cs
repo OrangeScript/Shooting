@@ -36,8 +36,7 @@ public sealed class ShooterCoopEnemy : NetworkBehaviour
         }
 
         movement.enabled = false;
-        foreach (Collider hitbox in GetComponentsInChildren<Collider>(true))
-            hitbox.enabled = false;
+        enemy.PrepareReplica();
         healthState.OnValueChanged += OnReplicaChanged;
         OnReplicaChanged(default, healthState.Value);
     }
